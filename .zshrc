@@ -145,8 +145,6 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 alias imissarch='sudo apt update && sudo apt upgrade && npm install npm -g && npm update -g'
 alias fuck='thefuck'
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
-alias pubkey="cat ~/.ssh/id_rsa.pub | pbcopy | echo '=> Public key copied to clipboard.'"
-alias shrug="echo '¯\_(ツ)_/¯' | pbcopy | echo '=> Copied to clipboard.'"
 
 # some more ls aliases
 alias ll='ls -l'

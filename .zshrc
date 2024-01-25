@@ -141,12 +141,15 @@ zstyle ':completion:*' verbose true
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
-# custom aliases
-alias imissarch='sudo apt update && sudo apt upgrade && npm install npm -g && npm update -g'
+# Homebrew
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+# Custom aliases
+alias imissarch='sudo apt update && sudo apt upgrade && flatpak update && sudo apt autoremove && sudo apt autoclean'
 alias fuck='thefuck'
 alias config='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# some more ls aliases
+# Some more ls aliases
 alias ll='ls -l'
 alias la='ls -A'
 alias l='ls -CF'
@@ -170,3 +173,5 @@ alias g="git"
 source ~/zshRepos/znap/znap.zsh  # Start Znap
 znap source marlonrichert/zsh-autocomplete # Znap Autocomplete
 
+# Clearing the console 
+# clear

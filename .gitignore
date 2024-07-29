@@ -1,0 +1,6 @@
+*
+!.gitignore
+!.config/Kvantum
+!.local/share/color-schemes
+!.local/share/konsole
+!.zshrc

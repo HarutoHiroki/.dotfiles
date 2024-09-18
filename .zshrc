@@ -85,7 +85,7 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # Custom aliases
-alias imlazy='sudo pacman -Syu && flatpak update'
+alias imlazy='sudo pacman -Syu && yay -Sy && flatpak update && sudo update-grub'
 alias fuck='thefuck'
 
 # Some more ls aliases

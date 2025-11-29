@@ -36,7 +36,7 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    - **Audio**: EasyEffects for that sweet, sweet audio processing
    - **Containers**: Docker (containerize all the things!)
    - **System Tools**: btop (htop but prettier), fastfetch (neofetch but faster)
-   - **Graphics**: Complete AMD or NVIDIA GPU stack with 32-bit support (gaming goes brrr)
+   - **Graphics**: Complete AMD GPU stack (smooth sailing) or NVIDIA stack (good luck soldier) with 32-bit support
    - **Media**: mpv (the best video player, fight me), imv image viewer, fwupd for firmware shenanigans
    - **VPN**: OpenVPN with GUI, WireGuard (for totally legal purposes)
    - **Network Tools**: Nmap, Wireshark (definitely for educational purposes only)
@@ -78,14 +78,14 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
 
 The script will ask you two important life questions:
 1. **Setup mode** (YOLO/unattended, paranoid/manual, or diet/customize-only)
-2. **GPU type** (AMD or NVIDIA) - only if you chose full bloat mode
+2. **GPU type** (AMD master race or NVIDIA pain mode) - only if you chose full bloat mode
 
 Or be a power user and specify options directly:
 ```bash
 ./bloater.sh unattended amd      # Full bloat: AMD GPU, hold my coffee
-./bloater.sh manual nvidia       # Full bloat: NVIDIA GPU, let me think about each step
+./bloater.sh manual nvidia       # Full bloat: NVIDIA GPU, prepare for driver hell
 ./bloater.sh customize-only      # Diet mode: just the pretty configs, hold the packages
-GPU_TYPE=nvidia ./bloater.sh     # Full bloat: NVIDIA GPU, prompt for YOLO level
+GPU_TYPE=nvidia ./bloater.sh     # Full bloat: NVIDIA GPU, I also hate myself
 ```
 
 ### Diet Mode (Customize-Only)
@@ -123,18 +123,25 @@ All customizations will automatically respect your chosen mode (paranoid/YOLO) a
 
 #### GPU Support (Team Red vs Team Green)
 
-The bloater supports both AMD and NVIDIA graphics cards with their respective bloat stacks:
+The bloater supports both AMD and NVIDIA graphics cards with their respective ~~bloat~~ driver stacks:
 
 **AMD Stack (The Open Source Champions):**
-- Mesa (OpenGL/Vulkan drivers that actually work)
-- VDPAU (hardware video acceleration)
-- Vulkan-radeon (for that sweet ray tracing)
-- 32-bit library support (because gaming)
+- Mesa (OpenGL/Vulkan drivers that actually work out of the box)
+- VDPAU (hardware video acceleration without selling your soul)
+- Vulkan-radeon (ray tracing without proprietary shackles)
+- 32-bit library support (seamless gaming experience)
+- Wayland support that doesn't make you want to cry
 
-**NVIDIA Stack (The Proprietary Overlords):**
-- NVIDIA proprietary drivers (Linus has opinions about these)
-- NVIDIA-utils and settings (tweak all the things)
-- Vulkan support (DLSS goes brrr)
-- 32-bit library support (also for gaming)
+**NVIDIA Stack (The Proprietary Overlords - Abandon Hope All Ye Who Enter Here):**
+- NVIDIA proprietary drivers ([Linus has opinions](https://www.youtube.com/watch?v=_36yNWw_07g) about these)
+- NVIDIA-utils and settings (because nothing can be simple)
+- Vulkan support (DLSS goes brrr when it works)
+- 32-bit library support (also for gaming, when the stars align)
+- Wayland "support" (good luck with that screen sharing and suspend/resume)
+- Kernel module signing headaches (SecureBoot says hello)
+- Breaking with every kernel update (dkms is your frenemy now)
+- That one bug that's been open for 3 years
+
+*Note to NVIDIA users: We support your GPU but question your life choices. Consider switching to AMD for your sanity.*
 
 **Note:** This bloater is specifically designed for Arch Linux with Hyprland. Review the script before unleashing it upon your system to ensure you actually want all this stuff. No refunds on disk space.

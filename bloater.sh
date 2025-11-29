@@ -5,16 +5,16 @@ set -u
 MODE="${1:-${MODE:-}}"
 
 if [[ -z "$MODE" ]]; then
-  echo "Select setup mode:"
-  echo "  1) unattended       - run everything automatically with --noconfirm"
-  echo "  2) manual           - prompt before each command"
-  echo "  3) customize-only   - only apply customizations (part 6)"
+  echo "Select your flavor of chaos:"
+  echo "  1) YOLO mode        - run everything automatically, living dangerously with --noconfirm"
+  echo "  2) Paranoid mode    - prompt before each command (trust issues are valid)"
+  echo "  3) Diet mode        - only apply visual customizations, hold the package avalanche"
   read -rp "Enter choice [1-3]: " choice
   case "$choice" in
     1) MODE="unattended" ;;
     2) MODE="manual" ;;
     3) MODE="customize-only" ;;
-    *) echo "Invalid choice. Defaulting to manual."; MODE="manual" ;;
+    *) echo "Invalid choice. Defaulting to paranoid mode because safety first."; MODE="manual" ;;
   esac
 fi
 
@@ -23,14 +23,14 @@ GPU_TYPE="${2:-${GPU_TYPE:-}}"
 
 if [[ "$MODE" != "customize-only" && -z "$GPU_TYPE" ]]; then
   echo
-  echo "Select GPU type:"
-  echo "  1) AMD     - install AMD graphics stack (Mesa, Vulkan, VDPAU)"
-  echo "  2) NVIDIA  - install NVIDIA proprietary drivers and utilities"
+  echo "Choose your GPU allegiance:"
+  echo "  1) AMD     - The open source champions (smooth sailing ahead)"
+  echo "  2) NVIDIA  - The proprietary overlords (prepare for driver hell)"
   read -rp "Enter choice [1-2]: " gpu_choice
   case "$gpu_choice" in
     1) GPU_TYPE="amd" ;;
     2) GPU_TYPE="nvidia" ;;
-    *) echo "Invalid choice. Defaulting to AMD."; GPU_TYPE="amd" ;;
+    *) echo "Invalid choice. Defaulting to AMD because we value your sanity."; GPU_TYPE="amd" ;;
   esac
 fi
 
@@ -69,10 +69,11 @@ else
   YAY_FLAGS=""
 fi
 
+echo "Bloater initializing..."
 echo "Running in mode: $MODE"
 if [[ "$MODE" != "customize-only" ]]; then
   echo "GPU type: $GPU_TYPE"
-  echo "Target user for chsh: $TARGET_USER"
+  echo "Target user for shell shenanigans: $TARGET_USER"
 fi
 echo
 
@@ -109,6 +110,7 @@ fi # End of part 1
 # 2) Install pacman packages
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Preparing to install approximately ALL the packages..."
 PACMAN_PACKAGES=$(cat <<'PKGS'
 # Fonts
 adobe-source-han-sans-jp-fonts
@@ -205,7 +207,7 @@ lib32-vulkan-icd-loader
 GPUPKGS
 )
   GPU_CMD="sudo pacman -S ${PACMAN_FLAGS} $(echo \"$GPU_PACKAGES\" | sed '/^\s*#/d;/^\s*$/d' | tr '\n' ' ')"
-  echo "Installing AMD graphics stack..."
+  echo "Installing AMD graphics stack (smooth sailing ahead)..."
   run_cmd "$GPU_CMD"
 elif [[ "$GPU_TYPE" == "nvidia" ]]; then
   GPU_PACKAGES=$(cat <<'GPUPKGS'
@@ -220,7 +222,8 @@ lib32-glu
 GPUPKGS
 )
   GPU_CMD="sudo pacman -S ${PACMAN_FLAGS} $(echo \"$GPU_PACKAGES\" | sed '/^\s*#/d;/^\s*$/d' | tr '\n' ' ')"
-  echo "Installing NVIDIA graphics stack..."
+  echo "Installing NVIDIA graphics stack (good luck soldier, you're gonna need it)..."
+  echo "Pro tip: If this breaks, we told you to go AMD"
   run_cmd "$GPU_CMD"
 fi
 fi # End of part 2b
@@ -229,6 +232,7 @@ fi # End of part 2b
 # 3) Install oh-my-zsh and set zsh as default shell
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Setting up Zsh (because vanilla Zsh is lonely)..."
 OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
 run_cmd "$OHMYZSH_CMD"
 
@@ -248,6 +252,7 @@ fi # End of part 3
 # 4) yay AUR installs
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Installing AUR packages (this is where the magic happens)..."
 AUR_PACKAGES="wireguard-gui-bin feishin steam protonup-qt minecraft-launcher visual-studio-code-bin bottles"
 YAY_CMD="yay -S ${YAY_FLAGS} ${AUR_PACKAGES}"
 run_cmd "$YAY_CMD"
@@ -257,11 +262,15 @@ fi # End of part 4
 # 5) Bootup themes install
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Installing bootup themes (because we're fancy like that)..."
+
 # Install CyberGRUB-2077 theme
+echo "Installing CyberGRUB-2077 theme..."
 CYBERGRUB_CMD="git clone https://github.com/adnksharp/CyberGRUB-2077.git && sudo ./CyberGRUB-2077/install.sh && rm -rf CyberGRUB-2077"
 run_cmd "$CYBERGRUB_CMD"
 
 # Install chika Plymouth theme
+echo "Installing chika Plymouth theme..."
 CHIKA_CMD="git clone https://git.jamjar.ws/strat/chika_plymouth.git && sudo cp -r chika_plymouth/theme /usr/share/plymouth/themes/chika && rm -rf chika_plymouth"
 UPDATE_PLYMOUTH_CMD="sudo plymouth-set-default-theme -R chika"
 run_cmd "$CHIKA_CMD"
@@ -271,32 +280,49 @@ fi # End of part 5
 # ===========================================================
 # 6) Apply customizations
 # ===========================================================
-echo "Applying customizations..."
-echo
+echo "Applying the secret sauce (customizations)..."
 
 # Copy .zshrc
+echo "Copying custom .zshrc..."
 run_cmd "cp -f .zshrc \"$HOME/\""
 
 # Monitor config
+echo "Configuring monitor settings..."
 HYPR_CONF_FILE="$HOME/.config/hypr/monitors.conf"
 MONITOR_LINE='monitor = , preferred, auto, 1.333334'
 run_cmd "echo \"$MONITOR_LINE\" >> \"$HYPR_CONF_FILE\""
 
 # Modify Kitty to use zsh
+echo "Updating Kitty terminal to use Zsh..."
 KITTY_FILE="$HOME/.config/kitty/kitty.conf"
 run_cmd "sed -i \"s/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/\" \"$KITTY_FILE\""
 
 # Modify Hyprland keybinds to add Vivaldi
+echo "Prioritizing Vivaldi in keybinds..."
 HYPR_KEYBINDS_FILE="$HOME/.config/hypr/hyprland/keybinds.conf"
 run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|\" \"$HYPR_KEYBINDS_FILE\""
+
+# ===========================================================
+# Add your own customizations here!
+# Use run_cmd for any modifications you want to persist
+# ===========================================================
+
+echo "✓ Customizations applied!"
 
 # ===========================================================
 # 7) Remove display managers
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Removing unused display managers (we don't need you anymore)..."
 REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
 run_cmd "$REMOVE_CMD"
 fi # End of part 7
 
 echo
-echo "Script finished (mode: $MODE)."
+echo "Bloating complete! Your system is now beautifully bloated."
+echo "Mode: $MODE"
+if [[ "$MODE" != "customize-only" && "$GPU_TYPE" == "nvidia" ]]; then
+  echo "Remember: You chose NVIDIA. May the driver gods be ever in your favor."
+fi
+echo
+echo "Time to reboot and enjoy your feature-packed monstrosity!"

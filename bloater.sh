@@ -284,7 +284,12 @@ echo "Applying the secret sauce (customizations)..."
 
 # Copy .zshrc
 echo "Copying custom .zshrc..."
-run_cmd "cp -f .zshrc \"$HOME/\""
+run_cmd "cp -f ./bloat_configs/.zshrc \"$HOME/\""
+
+# Copy illogical-impulse config
+echo "Copying custom illogical-impulse config..."
+II_CONFIG_DIR="$HOME/.config/illogical-impulse"
+run_cmd "cp -f ./bloat_configs/config.json \"$II_CONFIG_DIR/\""
 
 # Monitor config
 echo "Configuring monitor settings..."

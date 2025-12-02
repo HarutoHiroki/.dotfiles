@@ -6,7 +6,7 @@ This repository contains my personal dotfiles and an automated bloating script t
 
 **Important:** These dotfiles are specifically designed as extra spice for [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (illogical-impulse quickshell dots). You **must** install end-4's beautiful base configuration first before unleashing this bloater upon your system.
 
-**Also Important:** This bloater script is lovingly crafted for my **Framework Laptop 13** (AI 300 yada yada disappointed in you AMD) - the glorious champion of Right to Repair, where every component is actually replaceable and upgradeable. You know, a laptop that *doesn't* decide to commit sudoku after 2 years like certain ASUS models (GPU that died for some reason). While this script *might* work on your non-Framework device, there are no guarantees. Expect potential shenanigans on different hardware configurations, particularly those designed by corporations allergic to  iFixit scores.
+**Also Important:** This bloater script is lovingly crafted for my **Framework Laptop 13** (AI 300 yada yada smh AMD) - the glorious king of Right to Repair, where every component is actually replaceable and upgradeable. You know, a laptop that *doesn't* decide to commit sudoku after 2 years like a certain ASUS Zephyrus G15 whose GPU died >:(. While this script *might* work on your non-Framework device, there are no guarantees. Expect potential shenanigans on different hardware configurations, particularly those designed by corporations allergic to  iFixit scores.
 
 ## Prerequisites (The Boring Stuff You Can't Skip)
 

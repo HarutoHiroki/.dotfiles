@@ -127,6 +127,9 @@ git
 zip
 seahorse
 
+# X11
+xorg-xhost
+
 # Power management
 upower
 acpid
@@ -232,7 +235,7 @@ fi # End of part 2b
 # 3) Install oh-my-zsh and set zsh as default shell
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-echo "Setting up Zsh (because vanilla Zsh is lonely)..."
+echo "Setting up Zsh..."
 OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
 run_cmd "$OHMYZSH_CMD"
 
@@ -252,22 +255,115 @@ fi # End of part 3
 # 4) yay AUR installs
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-echo "Installing AUR packages (this is where the magic happens)..."
+echo "Installing AUR packages..."
 AUR_PACKAGES="wireguard-gui-bin feishin steam protonup-qt minecraft-launcher visual-studio-code-bin bottles"
 YAY_CMD="yay -S ${YAY_FLAGS} ${AUR_PACKAGES}"
 run_cmd "$YAY_CMD"
 fi # End of part 4
 
 # ===========================================================
-# 5) Bootup themes install
+# 5) More customizations
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-echo "Installing bootup themes (because we're fancy like that)..."
+
+# Install VS Code ~~bloat~~ extensions
+echo "Installing VS Code extensions..."
+VSCODE_EXTENSIONS=(
+aaron-bond.better-comments
+alefragnani.project-manager
+bradlc.vscode-tailwindcss
+codezombiech.gitignore
+dbaeumer.vscode-eslint
+donjayamanne.git-extension-pack
+donjayamanne.githistory
+eamodio.gitlens
+ecmel.vscode-html-css
+esbenp.prettier-vscode
+felipecaputo.git-project-manager
+github.codespaces
+github.copilot
+github.copilot-chat
+github.remotehub
+github.vscode-pull-request-github
+hookyqr.minify
+icrawl.discord-vscode
+janisdd.vscode-edit-csv
+ms-azuretools.vscode-containers
+ms-python.debugpy
+ms-python.python
+ms-python.vscode-pylance
+ms-python.vscode-python-envs
+ms-vscode-remote.remote-containers
+ms-vscode-remote.remote-ssh
+ms-vscode-remote.remote-ssh-edit
+ms-vscode.azure-repos
+ms-vscode.cmake-tools
+ms-vscode.cpptools
+ms-vscode.cpptools-extension-pack
+ms-vscode.cpptools-themes
+ms-vscode.remote-explorer
+ms-vscode.remote-repositories
+pkief.material-icon-theme
+rakib13332.material-code
+ritwickdey.liveserver
+rvest.vs-code-prettier-eslint
+t3dotgg.vsc-material-theme-but-i-wont-sue-you
+tomoki1207.pdf
+wakatime.vscode-wakatime
+yzhang.markdown-all-in-one
+zignd.html-css-class-completion
+ziyasal.vscode-open-in-github
+)
+
+for ext in "${VSCODE_EXTENSIONS[@]}"; do
+  VSCODE_EXT_CMD="code --install-extension ${ext}"
+  run_cmd "$VSCODE_EXT_CMD"
+done
+
+# Configure VS Code settings (theme and icons)
+echo "Configuring VS Code theme and icons..."
+VSCODE_SETTINGS_DIR="$HOME/.config/Code/User"
+VSCODE_SETTINGS_FILE="$VSCODE_SETTINGS_DIR/settings.json"
+
+run_cmd "mkdir -p \"$VSCODE_SETTINGS_DIR\""
+
+# Update or create settings.json with theme preferences
+VSCODE_THEME_CMD="jq '. + {\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' \"$VSCODE_SETTINGS_FILE\" 2>/dev/null > \"$VSCODE_SETTINGS_FILE.tmp\" && mv \"$VSCODE_SETTINGS_FILE.tmp\" \"$VSCODE_SETTINGS_FILE\" || echo '{\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' > \"$VSCODE_SETTINGS_FILE\""
+run_cmd "$VSCODE_THEME_CMD"
+
+# Remove unused display managers
+echo "Removing unused display managers (none look good)..."
+REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
+run_cmd "$REMOVE_CMD"
+
+# Configure Timeshift settings
+echo "Configuring Timeshift..."
+TIMESHIFT_CONFIG="/etc/timeshift/timeshift.json"
+TIMESHIFT_DEFAULT="/etc/timeshift/default.json"
+
+# Initialize config if needed
+run_cmd "sudo bash -c '[ ! -f \"$TIMESHIFT_CONFIG\" ] || [ ! -s \"$TIMESHIFT_CONFIG\" ] && { [ -f \"$TIMESHIFT_DEFAULT\" ] && cp \"$TIMESHIFT_DEFAULT\" \"$TIMESHIFT_CONFIG\" || echo \"{}\" > \"$TIMESHIFT_CONFIG\"; } || true'"
+
+# Configure Timeshift settings
+run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"true\" | .schedule_daily = \"true\" | .count_daily = \"5\" | .date_format = \"%Y-%m-%d %I:%M %p\"' \"$TIMESHIFT_CONFIG\" | sudo tee \"$TIMESHIFT_CONFIG.tmp\" > /dev/null && sudo mv \"$TIMESHIFT_CONFIG.tmp\" \"$TIMESHIFT_CONFIG\""
+
+fi # End of part 5
+
+# ===========================================================
+# 6) Bootup themes install
+# ===========================================================
+if [[ "$MODE" != "customize-only" ]]; then
+echo "Installing bootup themes..."
 
 # Install CyberGRUB-2077 theme
 echo "Installing CyberGRUB-2077 theme..."
 CYBERGRUB_CMD="git clone https://github.com/adnksharp/CyberGRUB-2077.git && sudo ./CyberGRUB-2077/install.sh && rm -rf CyberGRUB-2077"
 run_cmd "$CYBERGRUB_CMD"
+
+# Add plymouth to mkinitcpio.conf HOOKS
+echo "Adding plymouth to mkinitcpio.conf..."
+MKINIT_PLYMOUTH_CMD="sudo sed -i 's/^HOOKS=\(.*\)\(base udev\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf || sudo sed -i 's/^HOOKS=\(.*\)\(systemd\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf"
+run_cmd "$MKINIT_PLYMOUTH_CMD"
 
 # Install chika Plymouth theme
 echo "Installing chika Plymouth theme..."
@@ -275,21 +371,34 @@ CHIKA_CMD="git clone https://git.jamjar.ws/strat/chika_plymouth.git && sudo cp -
 UPDATE_PLYMOUTH_CMD="sudo plymouth-set-default-theme -R chika"
 run_cmd "$CHIKA_CMD"
 run_cmd "$UPDATE_PLYMOUTH_CMD"
-fi # End of part 5
+fi # End of part 6
 
 # ===========================================================
-# 6) Apply customizations
+# 7) Apply customizations
 # ===========================================================
-echo "Applying the secret sauce (customizations)..."
+echo "Applying the secret sauce..."
 
 # Copy .zshrc
 echo "Copying custom .zshrc..."
+if [[ -f "$HOME/.zshrc" ]]; then
+  echo "Backing up existing .zshrc to .zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+  run_cmd "cp \"$HOME/.zshrc\" \"$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)\""
+fi
 run_cmd "cp -f ./bloat_configs/.zshrc \"$HOME/\""
+
+# Copy wallpaper directory
+echo "Copying wallpaper directory..."
+run_cmd "mkdir -p \"$HOME/Wallpapers\""
+run_cmd "cp -r ./wallpaper/* \"$HOME/Wallpapers/\""
 
 # Copy illogical-impulse config
 echo "Copying custom illogical-impulse config..."
 II_CONFIG_DIR="$HOME/.config/illogical-impulse"
 run_cmd "cp -f ./bloat_configs/config.json \"$II_CONFIG_DIR/\""
+
+# Update wallpaper path to current user
+echo "Updating wallpaper path for current user..."
+run_cmd "sed -i 's|/home/[^/]*/Wallpapers/|/home/'\"$TARGET_USER\"'/Wallpapers/|g' \"$II_CONFIG_DIR/config.json\""
 
 # Monitor config
 echo "Configuring monitor settings..."
@@ -313,15 +422,6 @@ run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launc
 # ===========================================================
 
 echo "✓ Customizations applied!"
-
-# ===========================================================
-# 7) Remove display managers
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
-echo "Removing unused display managers (we don't need you anymore)..."
-REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
-run_cmd "$REMOVE_CMD"
-fi # End of part 7
 
 echo
 echo "Bloating complete! Your system is now beautifully bloated."

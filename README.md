@@ -79,6 +79,7 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    - Configures Hyprland monitor settings with oddly specific 1.333334 scaling
    - Updates Kitty terminal to use Zsh instead of Fish (sorry fish fans)
    - Modifies Hyprland keybinds to prioritize Vivaldi browser (Chrome who?)
+   - Adds fingerprint authentication to Hyprlock config (i paid for fingerprint, imma use it)
    - **Extensible**: Add your own ~~bloat~~ essential customizations in the marked section
 
 ### Usage (Time to Get Bloated)

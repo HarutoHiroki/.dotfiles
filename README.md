@@ -29,50 +29,45 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
 
 2. **Package Installation (The Main Event)**
    - **Fonts**: Every Japanese font known to mankind (Adobe Source Han, Noto CJK, IPA, VLGothic, Jigmo) plus compatibility fonts for that one weird app
-   - **Development**: Git (obviously), Zip, Seahorse (for when you forget your passwords)
-   - **X11**: xorg-xhost (Timeshift GTK throws a tantrum without it)
-   - **Power Management**: upower, acpid, powertop, power-profiles-daemon (laptop battery goes brrr)
-   - **Browser**: Vivaldi because screw you Google and Mozilla (I know its chromium-based but still)
-   - **Security**: Fingerprint authentication (libfprint, fprintd) for that CSI: Cyber aesthetic
-   - **Boot**: Plymouth splash screen (because plain text boot is for peasants)
-   - **Shell**: Zsh and Oh My Zsh (fish is cool but I prefer Zsh)
-   - **Audio**: EasyEffects for that sweet, sweet audio processing
-   - **Containers**: Docker (containerize all the things!)
-   - **System Tools**: btop (htop but prettier), fastfetch (neofetch creator took up farming), fwupd for firmware shenanigans
-   - **Graphics**: Complete AMD GPU stack (smooth sailing) or NVIDIA stack (good luck soldier) with 32-bit support
-   - **Media**: mpv (the best video player, fight me), imv image viewer
-   - **VPN**: OpenVPN with GUI, WireGuard (for totally legal purposes)
-   - **Network Tools**: Nmap, Wireshark (definitely for educational purposes only)
-   - **Gaming**: Wine, Lutris (Windows games on Linux)
+   - **Development**: `git` (duh), `zip`, `seahorse` (for when you forget your passwords)
+   - **X11**: `xorg-xhost` (Timeshift GTK throws a tantrum without it)
+   - **Power Management**: `upower`, `acpid`, `powertop`, `power-profiles-daemon` (laptop battery goes brrr)
+   - **Browser**: `vivaldi` (because screw you Google and Mozilla I know its chromium-based but still)
+   - **Security**: `libfprint`, `fprintd` (Fingerprint authentication)
+   - **Boot**: `plymouth` (splash screen because bloat is good)
+   - **Shell**: `zsh` and Oh My Zsh (fish is cool but I prefer Zsh)
+   - **Audio**: `easyeffects` (EQ is the way)
+   - **Containers**: `docker` (containerize all the things!)
+   - **System Tools**: `btop` (htop but prettier), `fastfetch` (neofetch creator took up farming), `fwupd` for firmware shenanigans
+   - **Graphics**: Complete AMD GPU stack (smooth sailing) or NVIDIA stack (o7) with 32-bit support (more info below)
+   - **Media**: `mpv` (the best video player, fight me), `imv` image viewer
+   - **VPN**: `openvpn` and `networkmanager-openvpn`, `wireguard-tools` (for totally legal purposes)
+   - **Network Tools**: `nmap`, `wireshark` (definitely for educational purposes only)
+   - **Gaming**: `wine`, `lutris` (Windows games on Linux)
    - **Flatpak**: Because sometimes you need extra sandboxes
 
-3. **Shell Setup (Embrace the Zsh Life)**
+3. **AUR Packages (The Fun Stuff)**
+   - `feishin` (music streaming client for the audiophiles)
+   - `steam` (gaming, obviously)
+   - `protonup-qt` (make Windows games work, it's basically magic)
+   - `minecraft-launcher` (GET THE FK OUT OF MY ROOM I'M PLAYING MINECRAFT)
+   - `visual-studio-code-bin` (yes, the proprietary one, sue me)
+   - `bottles` (run Windows apps without the shame of dual-booting)
+
+4. **Initial Setup**
    - Installs Oh My Zsh framework
    - Sets Zsh as default shell
-
-4. **AUR Packages (The Fun Stuff)**
-   - WireGuard GUI (pretty VPN buttons)
-   - Feishin (music streaming client for the audiophiles)
-   - Steam (gaming, obviously)
-   - ProtonUp-Qt (make Windows games work, it's basically magic)
-   - Minecraft Launcher (don't judge)
-   - Visual Studio Code (yes, the proprietary one, sue me)
-   - Bottles (run Windows apps without the shame of dual-booting)
-
-5. **Additional Schtuff**
-   - Installs 44 essential VSCode extensions for maximum productivity bloat
-   - Sets color theme to Material Theme Ocean
-   - Applies Material Icon Theme
-   - Removes unused display managers (SDDM, GDM, LightDM)
+   - Installs 44 essential VSCode extensions for maximum productivity bloat; if you want to look at the list, check the script
+     - Sets color theme to Material Theme Ocean
+     - Applies Material Icon Theme
    - Configures Timeshift for automatic snapshots
    - Configures Discord to skip host updates (preserves existing settings)
    - Sets up PAM for Hyprlock fingerprint authentication
-
-6. **Bootup Themes (Aesthetic Overload)**
+   - Removes unused display managers (SDDM, GDM, LightDM)
    - Installs CyberGRUB-2077 GRUB theme (cyberpunk your bootloader)
    - Installs chika Plymouth theme (because the venn diagram between linux users and weebs is a circle)
 
-7. **Desktop Customizations (The Secret Sauce)**
+5. **Desktop Customizations (The Secret Sauce)**
    - Copies custom `.zshrc` configuration (aliases upon aliases)
    - Copies wallpaper directory to `~/Wallpapers/` (WORLD POMUFICATION)
    - Copies custom illogical-impulse `config.json` with automatic wallpaper path updates
@@ -112,14 +107,14 @@ Use diet mode:
 ./bloater.sh customize-only
 ```
 
-This mode skips the entire package avalanche (parts 1-6) and only applies the part 7 customizations. Your disk space is safe... for now.
+This mode skips the entire package avalanche (parts 1-4) and only applies the part 5 customizations. Your disk space is safe... for now.
 
 ### Adding Your Own Bloat (I Mean, Customizations)
 
 To add new customizations that will run in all modes (including diet mode):
 
 1. Open `bloater.sh` in your favorite text editor
-2. Navigate to **Part 7** (the customization zone)
+2. Navigate to **Part 5** (the customization zone)
 3. Add your ~~bloat~~ essential tweaks using the `run_cmd` function
 
 Example (totally necessary additions):

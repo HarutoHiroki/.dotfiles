@@ -232,9 +232,21 @@ fi
 fi # End of part 2b
 
 # ===========================================================
-# 3) Install oh-my-zsh and set zsh as default shell
+# 3) yay AUR installs
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
+echo "Installing AUR packages..."
+AUR_PACKAGES="feishin steam protonup-qt minecraft-launcher visual-studio-code-bin bottles"
+YAY_CMD="yay -S ${YAY_FLAGS} ${AUR_PACKAGES}"
+run_cmd "$YAY_CMD"
+fi # End of part 3
+
+# ===========================================================
+# 4) Initial Setup and Configurations
+# ===========================================================
+if [[ "$MODE" != "customize-only" ]]; then
+
+# Install oh-my-zsh and set zsh as default shell
 echo "Setting up Zsh..."
 OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
 run_cmd "$OHMYZSH_CMD"
@@ -249,22 +261,6 @@ if [[ -n "$ZSH_PATH" ]]; then
 else
   echo "zsh not found; skipping chsh."
 fi
-fi # End of part 3
-
-# ===========================================================
-# 4) yay AUR installs
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
-echo "Installing AUR packages..."
-AUR_PACKAGES="wireguard-gui-bin feishin steam protonup-qt minecraft-launcher visual-studio-code-bin bottles"
-YAY_CMD="yay -S ${YAY_FLAGS} ${AUR_PACKAGES}"
-run_cmd "$YAY_CMD"
-fi # End of part 4
-
-# ===========================================================
-# 5) More customizations
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
 
 # Install VS Code ~~bloat~~ extensions
 echo "Installing VS Code extensions..."
@@ -331,11 +327,6 @@ run_cmd "mkdir -p \"$VSCODE_SETTINGS_DIR\""
 VSCODE_THEME_CMD="jq '. + {\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' \"$VSCODE_SETTINGS_FILE\" 2>/dev/null > \"$VSCODE_SETTINGS_FILE.tmp\" && mv \"$VSCODE_SETTINGS_FILE.tmp\" \"$VSCODE_SETTINGS_FILE\" || echo '{\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' > \"$VSCODE_SETTINGS_FILE\""
 run_cmd "$VSCODE_THEME_CMD"
 
-# Remove unused display managers
-echo "Removing unused display managers (none look good)..."
-REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
-run_cmd "$REMOVE_CMD"
-
 # Configure Timeshift settings
 echo "Configuring Timeshift..."
 TIMESHIFT_CONFIG="/etc/timeshift/timeshift.json"
@@ -387,12 +378,11 @@ PAMEOF"
 fi
 run_cmd "$PAM_CONFIG_CMD"
 
-fi # End of part 5
+# Remove unused display managers
+echo "Removing unused display managers (none look good)..."
+REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
+run_cmd "$REMOVE_CMD"
 
-# ===========================================================
-# 6) Bootup themes install
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
 echo "Installing bootup themes..."
 
 # Install CyberGRUB-2077 theme
@@ -411,10 +401,10 @@ CHIKA_CMD="git clone https://git.jamjar.ws/strat/chika_plymouth.git && sudo cp -
 UPDATE_PLYMOUTH_CMD="sudo plymouth-set-default-theme -R chika"
 run_cmd "$CHIKA_CMD"
 run_cmd "$UPDATE_PLYMOUTH_CMD"
-fi # End of part 6
+fi # End of part 4
 
 # ===========================================================
-# 7) Apply customizations
+# 5) Apply customizations
 # ===========================================================
 echo "Applying the secret sauce..."
 
@@ -479,6 +469,7 @@ fi
 # ===========================================================
 
 echo "✓ Customizations applied!"
+# End of part 5
 
 echo
 echo "Bloating complete! Your system is now beautifully bloated."

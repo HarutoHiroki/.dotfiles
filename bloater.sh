@@ -347,6 +347,46 @@ run_cmd "sudo bash -c '[ ! -f \"$TIMESHIFT_CONFIG\" ] || [ ! -s \"$TIMESHIFT_CON
 # Configure Timeshift settings
 run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"true\" | .schedule_daily = \"true\" | .count_daily = \"5\" | .date_format = \"%Y-%m-%d %I:%M %p\"' \"$TIMESHIFT_CONFIG\" | sudo tee \"$TIMESHIFT_CONFIG.tmp\" > /dev/null && sudo mv \"$TIMESHIFT_CONFIG.tmp\" \"$TIMESHIFT_CONFIG\""
 
+# Configure Discord to skip host updates
+echo "Configuring Discord settings..."
+DISCORD_SETTINGS="$HOME/.config/discord/settings.json"
+run_cmd "mkdir -p \"$HOME/.config/discord\""
+
+# Create or update Discord settings
+if [[ -f "$DISCORD_SETTINGS" && -s "$DISCORD_SETTINGS" ]]; then
+  # File exists and has content, append to existing JSON
+  DISCORD_UPDATE_CMD="jq '. + {\"SKIP_HOST_UPDATE\": true}' \"$DISCORD_SETTINGS\" > \"$DISCORD_SETTINGS.tmp\" && mv \"$DISCORD_SETTINGS.tmp\" \"$DISCORD_SETTINGS\""
+else
+  # File doesn't exist or is empty, create new JSON
+  DISCORD_UPDATE_CMD="echo '{\"SKIP_HOST_UPDATE\": true}' > \"$DISCORD_SETTINGS\""
+fi
+run_cmd "$DISCORD_UPDATE_CMD"
+
+# Configure PAM for Hyprlock with fingerprint support
+echo "Configuring PAM for Hyprlock fingerprint authentication..."
+HYPRLOCK_PAM="/etc/pam.d/hyprlock"
+
+# Check if already configured, otherwise create the PAM file
+if [[ "$MODE" == "manual" ]]; then
+  PAM_CONFIG_CMD="if sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null; then echo 'Hyprlock PAM fingerprint already configured'; else sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
+auth     sufficient pam_fprintd.so
+auth     include    system-auth
+account  include    system-auth
+password include    system-auth
+session  include    system-auth
+PAMEOF
+fi"
+else
+  PAM_CONFIG_CMD="sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null || sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
+auth     sufficient pam_fprintd.so
+auth     include    system-auth
+account  include    system-auth
+password include    system-auth
+session  include    system-auth
+PAMEOF"
+fi
+run_cmd "$PAM_CONFIG_CMD"
+
 fi # End of part 5
 
 # ===========================================================
@@ -415,6 +455,23 @@ run_cmd "sed -i \"s/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/\" \"$KI
 echo "Prioritizing Vivaldi in keybinds..."
 HYPR_KEYBINDS_FILE="$HOME/.config/hypr/hyprland/keybinds.conf"
 run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|\" \"$HYPR_KEYBINDS_FILE\""
+
+# Enable fingerprint in Hyprlock config
+echo "Enabling fingerprint authentication in Hyprlock..."
+HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
+
+if grep -q 'fingerprint:enabled' "$HYPRLOCK_CONF" 2>/dev/null; then
+  HYPRLOCK_UPDATE_CMD="sed -i 's/fingerprint:enabled[[:space:]]*=.*/fingerprint:enabled = true/' \"$HYPRLOCK_CONF\""
+  run_cmd "$HYPRLOCK_UPDATE_CMD"
+else
+  HYPRLOCK_ADD_CMD="tee -a \"$HYPRLOCK_CONF\" >/dev/null <<'HYPREOF'
+
+auth {
+  fingerprint:enabled = true
+}
+HYPREOF"
+  run_cmd "$HYPRLOCK_ADD_CMD"
+fi
 
 # ===========================================================
 # Add your own customizations here!

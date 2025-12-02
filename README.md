@@ -65,6 +65,8 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    - Applies Material Icon Theme
    - Removes unused display managers (SDDM, GDM, LightDM)
    - Configures Timeshift for automatic snapshots
+   - Configures Discord to skip host updates (preserves existing settings)
+   - Sets up PAM for Hyprlock fingerprint authentication
 
 6. **Bootup Themes (Aesthetic Overload)**
    - Installs CyberGRUB-2077 GRUB theme (cyberpunk your bootloader)
@@ -149,10 +151,7 @@ The bloater supports both AMD and NVIDIA graphics cards with their respective ~~
 - NVIDIA-utils and settings (because nothing can be simple)
 - Vulkan support (DLSS goes brrr when it works)
 - 32-bit library support (also for gaming, when the stars align)
-- Wayland "support" (good luck with that screen sharing and suspend/resume)
-- Kernel module signing headaches (SecureBoot says hello)
-- Breaking with every kernel update (dkms is your frenemy now)
-- That one bug that's been open for 3 years
+- **LOTS** of potential headaches and driver conflicts, especially with Wayland (look it up)
 
 *Note to NVIDIA users: We support your GPU but question your life choices. Consider switching to AMD for your sanity.*
 

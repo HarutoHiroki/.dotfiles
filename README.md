@@ -19,7 +19,7 @@ This repository contains my personal dotfiles and an automated bloating script t
 The `bloater.sh` (formerly known by its boring name `install.sh`) is designed for Arch Linux systems and automates the transformation of your lightweight system into a feature-complete powerhouse on top of the illogical impulse quickshell dots. It supports three flavors of chaos:
 - **YOLO mode** (unattended): Runs all commands automatically with reckless abandon and `--noconfirm` flags
 - **Paranoid mode** (manual): Prompts before each command because trust issues are valid
-- **Diet mode** (customize-only): Only applies visual customizations, skipping the package avalanche
+- **Dots changes only mode** (customize-only): Only applies visual customizations, skipping the package avalanche - intended for first install or after updates
 
 ### What the Bloater Does (Buckle Up)
 
@@ -91,18 +91,18 @@ Or be a power user and specify options directly:
 ```bash
 ./bloater.sh unattended amd      # Full bloat: AMD GPU, hold my coffee
 ./bloater.sh manual nvidia       # Full bloat: NVIDIA GPU, prepare for driver hell
-./bloater.sh customize-only      # Diet mode: just the pretty configs, hold the packages
+./bloater.sh customize-only      # Dots changes only: just the pretty configs, hold the packages
 GPU_TYPE=nvidia ./bloater.sh     # Full bloat: NVIDIA GPU, I also hate myself
 ```
 
-### Diet Mode (Customize-Only)
+### Dots Changes Only Mode (Customize-Only)
 
-If you've already bloated your system and just want the cosmetic tweaks, or if you:
-- Want to re-apply customizations after updates to end-4's dots
+If you've just installed end-4's dots or updated them and want to apply my customizations:
+- First install of end-4 dots - apply my visual tweaks without the package bloat
+- After updates to end-4's dots - re-apply customizations to stay current
 - Want to test new configs without downloading the internet again
-- Just installed a fresh end-4 dots and only want my visual tweaks
 
-Use diet mode:
+Use dots changes only mode:
 ```bash
 ./bloater.sh customize-only
 ```
@@ -111,7 +111,7 @@ This mode skips the entire package avalanche (parts 1-4) and only applies the pa
 
 ### Adding Your Own Bloat (I Mean, Customizations)
 
-To add new customizations that will run in all modes (including diet mode):
+To add new customizations that will run in all modes (including dots changes only mode):
 
 1. Open `bloater.sh` in your favorite text editor
 2. Navigate to **Part 5** (the customization zone)

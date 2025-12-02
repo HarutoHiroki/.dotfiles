@@ -6,9 +6,9 @@ MODE="${1:-${MODE:-}}"
 
 if [[ -z "$MODE" ]]; then
   echo "Select your flavor of chaos:"
-  echo "  1) YOLO mode        - run everything automatically, living dangerously with --noconfirm"
-  echo "  2) Paranoid mode    - prompt before each command (trust issues are valid)"
-  echo "  3) Diet mode        - only apply visual customizations, hold the package avalanche"
+  echo "  1) YOLO mode              - run everything automatically, living dangerously with --noconfirm"
+  echo "  2) Paranoid mode          - prompt before each command (trust issues are valid)"
+  echo "  3) Dots changes only mode - only apply visual customizations (first install or after updates)"
   read -rp "Enter choice [1-3]: " choice
   case "$choice" in
     1) MODE="unattended" ;;

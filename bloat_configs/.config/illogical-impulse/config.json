@@ -286,14 +286,14 @@
             "radius": 100
         },
         "centerClock": true,
-        "launchOnStartup": true,
+        "launchOnStartup": false,
         "materialShapeChars": true,
         "security": {
             "requirePasswordToPower": false,
             "unlockKeyring": true
         },
         "showLockedText": true,
-        "useHyprlock": false
+        "useHyprlock": true
     },
     "media": {
         "filterDuplicatePlayers": true

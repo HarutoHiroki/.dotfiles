@@ -64,8 +64,9 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    - Configures Discord to skip host updates (preserves existing settings)
    - Sets up PAM for Hyprlock fingerprint authentication
    - Removes unused display managers (SDDM, GDM, LightDM)
-   - Installs CyberGRUB-2077 GRUB theme (cyberpunk your bootloader)
-   - Installs chika Plymouth theme (because the venn diagram between linux users and weebs is a circle)
+   - Installs bootup themes:
+     - CyberGRUB-2077 GRUB theme (cyberpunk your bootloader)
+     - chika Plymouth theme (because the venn diagram between linux users and weebs is almost a circle)
 
 5. **Desktop Customizations (The Secret Sauce)**
    - Copies custom `.zshrc` configuration (aliases upon aliases)
@@ -74,7 +75,7 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    - Configures Hyprland monitor settings with oddly specific 1.333334 scaling
    - Updates Kitty terminal to use Zsh instead of Fish (sorry fish fans)
    - Modifies Hyprland keybinds to prioritize Vivaldi browser (Chrome who?)
-   - Adds fingerprint authentication to Hyprlock config (i paid for fingerprint, imma use it)
+   - Copies Hyprlock config file (cuz original dots didn't customize it)
    - **Extensible**: Add your own ~~bloat~~ essential customizations in the marked section
 
 ### Usage (Time to Get Bloated)

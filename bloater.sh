@@ -26,10 +26,12 @@ if [[ "$MODE" != "customize-only" && -z "$GPU_TYPE" ]]; then
   echo "Choose your GPU allegiance:"
   echo "  1) AMD     - The open source champions (smooth sailing ahead)"
   echo "  2) NVIDIA  - The proprietary overlords (prepare for driver hell)"
-  read -rp "Enter choice [1-2]: " gpu_choice
+  echo "  3) Skip    - I'll handle my own GPU drivers (brave soul)"
+  read -rp "Enter choice [1-3]: " gpu_choice
   case "$gpu_choice" in
     1) GPU_TYPE="amd" ;;
     2) GPU_TYPE="nvidia" ;;
+    3) GPU_TYPE="skip" ;;
     *) echo "Invalid choice. Defaulting to AMD because we value your sanity."; GPU_TYPE="amd" ;;
   esac
 fi
@@ -194,7 +196,7 @@ fi # End of part 2
 # ===========================================================
 # 2b) Install GPU-specific packages
 # ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
+if [[ "$MODE" != "customize-only" && "$GPU_TYPE" != "skip" ]]; then
 if [[ "$GPU_TYPE" == "amd" ]]; then
   GPU_PACKAGES=$(cat <<'GPUPKGS'
 mesa
@@ -472,8 +474,12 @@ echo "✓ Customizations applied!"
 echo
 echo "Bloating complete! Your system is now beautifully bloated."
 echo "Mode: $MODE"
-if [[ "$MODE" != "customize-only" && "$GPU_TYPE" == "nvidia" ]]; then
-  echo "Remember: You chose NVIDIA. May the driver gods be ever in your favor."
+if [[ "$MODE" != "customize-only" ]]; then
+  if [[ "$GPU_TYPE" == "nvidia" ]]; then
+    echo "Remember: You chose NVIDIA. May the driver gods be ever in your favor."
+  elif [[ "$GPU_TYPE" == "skip" ]]; then
+    echo "GPU drivers skipped. Don't forget to install them yourself!"
+  fi
 fi
 echo
 echo "Time to reboot and enjoy your feature-packed monstrosity!"

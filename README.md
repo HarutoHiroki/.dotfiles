@@ -86,12 +86,13 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
 
 The script will ask you two important life questions:
 1. **Setup mode** (YOLO/unattended, paranoid/manual, or diet/customize-only)
-2. **GPU type** (AMD master race or NVIDIA pain mode) - only if you chose full bloat mode
+2. **GPU type** (AMD master race, NVIDIA pain mode, or skip entirely) - only if you chose full bloat mode
 
 Or be a power user and specify options directly:
 ```bash
 ./bloater.sh unattended amd      # Full bloat: AMD GPU, hold my coffee
 ./bloater.sh manual nvidia       # Full bloat: NVIDIA GPU, prepare for driver hell
+./bloater.sh unattended skip     # Full bloat: Skip GPU drivers, I got this
 ./bloater.sh customize-only      # Dots changes only: just the pretty configs, hold the packages
 GPU_TYPE=nvidia ./bloater.sh     # Full bloat: NVIDIA GPU, I also hate myself
 ```
@@ -132,9 +133,9 @@ run_cmd "sed 's|/home/olduser/|/home/'\"$TARGET_USER\"'/|g' ./template.conf > \"
 
 All customizations will automatically respect your chosen mode (paranoid/YOLO) and prompt accordingly.
 
-#### GPU Support (Team Red vs Team Green)
+#### GPU Support (Team Red vs Team Green vs DIY)
 
-The bloater supports both AMD and NVIDIA graphics cards with their respective ~~bloat~~ driver stacks:
+The bloater supports AMD and NVIDIA graphics cards with their respective ~~bloat~~ driver stacks, or you can skip GPU driver installation entirely if you want to handle it yourself:
 
 **AMD Stack (Open Sourced means better):**
 - Mesa (OpenGL/Vulkan drivers that actually work out of the box)
@@ -149,6 +150,12 @@ The bloater supports both AMD and NVIDIA graphics cards with their respective ~~
 - Vulkan support (DLSS goes brrr when it works)
 - 32-bit library support (also for gaming, when the stars align)
 - **LOTS** of potential headaches and driver conflicts, especially with Wayland (look it up)
+
+**Skip Option (For the DIY Enthusiasts):**
+- No GPU drivers installed by the bloater
+- Useful if you have special requirements or exotic hardware
+- Perfect for when you already have drivers set up
+- For the brave souls who know exactly what they're doing
 
 *Note to NVIDIA users: We support your GPU but question your life choices. Consider switching to AMD for your sanity.*
 

@@ -76,8 +76,8 @@
             "widgetsFactor": 1.2,
             "workspaceZoom": 1
         },
-        "thumbnailPath": "",
-        "wallpaperPath": "/home/njord/Wallpapers/3Septemberwp2022.png",
+        "thumbnailPath": "/home/njord/.config/hypr/custom/scripts/mpvpaper_thumbnails/Kayoko.mp4.jpg",
+        "wallpaperPath": "/home/njord/Wallpapers/Kayoko.jpg",
         "widgets": {
             "clock": {
                 "cookie": {

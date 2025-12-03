@@ -424,7 +424,7 @@ run_cmd "cp -r ./wallpaper/* \"$HOME/Wallpapers/\""
 # Copy illogical-impulse config
 echo "Copying custom illogical-impulse config..."
 II_CONFIG_DIR="$HOME/.config/illogical-impulse"
-run_cmd "cp -f ./bloat_configs/config.json \"$II_CONFIG_DIR/\""
+run_cmd "cp -f ./bloat_configs/.config/illogical-impulse/config.json \"$II_CONFIG_DIR/\""
 
 # Update wallpaper path to current user
 echo "Updating wallpaper path for current user..."
@@ -446,22 +446,20 @@ echo "Prioritizing Vivaldi in keybinds..."
 HYPR_KEYBINDS_FILE="$HOME/.config/hypr/hyprland/keybinds.conf"
 run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|\" \"$HYPR_KEYBINDS_FILE\""
 
-# Enable fingerprint in Hyprlock config
-echo "Enabling fingerprint authentication in Hyprlock..."
+# Copy Hyprlock helper script
+echo "Copying Hyprlock helper script..."
+HYPRLOCK_DIR="$HOME/.config/hypr/hyprlock"
+run_cmd "mkdir -p \"$HYPRLOCK_DIR\""
+run_cmd "cp -f ./bloat_configs/.config/hypr/hyprlock/get_wallpaper_path.sh \"$HYPRLOCK_DIR/\""
+
+# Copy custom Hyprlock config
+echo "Copying custom Hyprlock config..."
 HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
-
-if grep -q 'fingerprint:enabled' "$HYPRLOCK_CONF" 2>/dev/null; then
-  HYPRLOCK_UPDATE_CMD="sed -i 's/fingerprint:enabled[[:space:]]*=.*/fingerprint:enabled = true/' \"$HYPRLOCK_CONF\""
-  run_cmd "$HYPRLOCK_UPDATE_CMD"
-else
-  HYPRLOCK_ADD_CMD="tee -a \"$HYPRLOCK_CONF\" >/dev/null <<'HYPREOF'
-
-auth {
-  fingerprint:enabled = true
-}
-HYPREOF"
-  run_cmd "$HYPRLOCK_ADD_CMD"
+if [[ -f "$HYPRLOCK_CONF" ]]; then
+  echo "Backing up existing hyprlock.conf to hyprlock.conf.backup.$(date +%Y%m%d_%H%M%S)"
+  run_cmd "cp \"$HYPRLOCK_CONF\" \"$HYPRLOCK_CONF.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
+run_cmd "cp -f ./bloat_configs/.config/hypr/hyprlock.conf \"$HYPRLOCK_CONF\""
 
 # ===========================================================
 # Add your own customizations here!

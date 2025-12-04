@@ -280,6 +280,9 @@ GRUB_CFG="/etc/default/grub"
 GRUB_THEME_LINE="GRUB_THEME=\"${CYBERGRUB_THEME_DIR}/theme.txt\""
 run_cmd "if sudo grep -qE '^#?GRUB_THEME=' \"${GRUB_CFG}\"; then sudo sed -i -E 's|^#?GRUB_THEME=.*|${GRUB_THEME_LINE}|' \"${GRUB_CFG}\"; else echo '${GRUB_THEME_LINE}' | sudo tee -a \"${GRUB_CFG}\" > /dev/null; fi"
 
+# Add splash to GRUB_CMDLINE_LINUX_DEFAULT if not present
+run_cmd "if ! sudo grep -E '^GRUB_CMDLINE_LINUX_DEFAULT=.*splash' \"${GRUB_CFG}\" >/dev/null 2>&1; then sudo sed -i -E 's/^(GRUB_CMDLINE_LINUX_DEFAULT=\"[^\"]*)(\")/\\1 splash\\2/' \"${GRUB_CFG}\"; fi"
+
 # Update GRUB
 run_cmd "sudo grub-mkconfig -o /boot/grub/grub.cfg"
 

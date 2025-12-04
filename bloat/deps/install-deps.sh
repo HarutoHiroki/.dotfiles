@@ -35,12 +35,16 @@ install-local-pkgbuild() {
   
   x yay -S --sudoloop $installflags --asdeps "${depends[@]}"
   
+  # Clean any previous build artifacts to avoid conflicts
+  rm -f *.pkg.tar.zst
+  
   # Build and install the metapackage
   # -A: Ignore incomplete arch field
   # -f: Force build
   # -s: Install missing dependencies
   # -i: Install after build
-  x makepkg -Afsi --noconfirm
+  # -c: Clean up temporary files after build
+  x makepkg -Afsic --noconfirm
   x popd
 }
 

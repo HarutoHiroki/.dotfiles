@@ -278,14 +278,14 @@ run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/CyberGRUB-2077\" \"${GRUB_THE
 # Update GRUB config to use the theme
 GRUB_CFG="/etc/default/grub"
 GRUB_THEME_LINE="GRUB_THEME=\"${CYBERGRUB_THEME_DIR}/theme.txt\""
-run_cmd "sudo sed -i -E 's|^#?GRUB_THEME=.*|${GRUB_THEME_LINE}|' \"${GRUB_CFG}\" || echo '${GRUB_THEME_LINE}' | sudo tee -a \"${GRUB_CFG}\" > /dev/null"
+run_cmd "if sudo grep -qE '^#?GRUB_THEME=' \"${GRUB_CFG}\"; then sudo sed -i -E 's|^#?GRUB_THEME=.*|${GRUB_THEME_LINE}|' \"${GRUB_CFG}\"; else echo '${GRUB_THEME_LINE}' | sudo tee -a \"${GRUB_CFG}\" > /dev/null; fi"
 
 # Update GRUB
 run_cmd "sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
 # Add plymouth to mkinitcpio.conf HOOKS
 echo "Adding plymouth to mkinitcpio.conf..."
-MKINIT_PLYMOUTH_CMD="sudo sed -i 's/^HOOKS=\(.*\)\(base udev\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf || sudo sed -i 's/^HOOKS=\(.*\)\(systemd\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf"
+MKINIT_PLYMOUTH_CMD="if ! grep -q 'plymouth' /etc/mkinitcpio.conf; then sudo sed -i 's/^HOOKS=\(.*\)\(base udev\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf || sudo sed -i 's/^HOOKS=\(.*\)\(systemd\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf; else echo 'plymouth already in HOOKS, skipping...'; fi"
 run_cmd "$MKINIT_PLYMOUTH_CMD"
 
 # Install chika Plymouth theme
@@ -327,17 +327,17 @@ run_cmd "sed -i 's|/home/[^/]*/Wallpapers/|/home/'\"$TARGET_USER\"'/Wallpapers/|
 echo "Configuring monitor settings..."
 HYPR_CONF_FILE="${XDG_CONFIG_HOME}/hypr/monitors.conf"
 MONITOR_LINE='monitor = , preferred, auto, 1.333334'
-run_cmd "echo \"$MONITOR_LINE\" >> \"$HYPR_CONF_FILE\""
+run_cmd "grep -qF '\"$MONITOR_LINE\"' \"$HYPR_CONF_FILE\" 2>/dev/null || echo \"$MONITOR_LINE\" >> \"$HYPR_CONF_FILE\""
 
 # Modify Kitty to use zsh
 echo "Updating Kitty terminal to use Zsh..."
 KITTY_FILE="${XDG_CONFIG_HOME}/kitty/kitty.conf"
-run_cmd "sed -i \"s/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/\" \"$KITTY_FILE\""
+run_cmd "if grep -q '^shell fish' \"$KITTY_FILE\" 2>/dev/null; then sed -i 's/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/' \"$KITTY_FILE\"; elif ! grep -q '^shell zsh' \"$KITTY_FILE\" 2>/dev/null; then echo 'shell zsh' >> \"$KITTY_FILE\"; fi"
 
 # Modify Hyprland keybinds to add Vivaldi
 echo "Prioritizing Vivaldi in keybinds..."
 HYPR_KEYBINDS_FILE="${XDG_CONFIG_HOME}/hypr/hyprland/keybinds.conf"
-run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|\" \"$HYPR_KEYBINDS_FILE\""
+run_cmd "if grep -q 'launch_first_available.sh.*Browser' \"$HYPR_KEYBINDS_FILE\" 2>/dev/null && ! grep -q '\\\"vivaldi\\\"' \"$HYPR_KEYBINDS_FILE\" 2>/dev/null; then sed -i 's|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|' \"$HYPR_KEYBINDS_FILE\"; fi"
 
 # Copy Hyprlock helper script
 echo "Copying Hyprlock helper script..."

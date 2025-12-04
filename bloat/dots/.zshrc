@@ -110,7 +110,7 @@ alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 alias dotsupdate="cd ~/.cache/dots-hyprland && git stash && git pull && ./setup install"
 
 # Download Znap, if it's not there yet.
-[[ -r ~/zshRepos/znap/znap.zsh ]] ||
+[[ -r ~/.config/zsh/custom/znap/znap.zsh ]] ||
     git clone --depth 1 -- \
         https://github.com/marlonrichert/zsh-snap.git ~/.config/zsh/custom/znap
 source ~/.config/zsh/custom/znap.zsh  # Start Znap

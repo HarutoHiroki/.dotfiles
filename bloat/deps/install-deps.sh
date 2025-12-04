@@ -49,7 +49,7 @@ install-local-pkgbuild() {
 #####################################################################################
 
 if ! command -v pacman >/dev/null 2>&1; then
-  printf "${STY_RED}[bloater]: pacman not found, this script requires Arch Linux.${STY_RST}\\n"
+  printf "${STY_RED}[bloater]: pacman not found, this script requires Arch Linux.${STY_RST}\n"
   exit 1
 fi
 
@@ -61,14 +61,14 @@ fi
 # Enable multilib
 enable_multilib() {
   local pacman_conf="/etc/pacman.conf"
-  if sudo grep -qE '^[[:space:]]*\\[multilib\\]' "$pacman_conf"; then
+  if sudo grep -qE '^[[:space:]]*\[multilib\]' "$pacman_conf"; then
     echo "multilib already enabled"
     return 0
   fi
 
   echo "Enabling multilib"
-  if sudo sed -n '/#\\[multilib\\]/,/#Include = \\/etc\\/pacman.d\\/mirrorlist/ p' "$pacman_conf" | grep -q '\\[multilib\\]'; then
-    sudo sed -i '/#\\[multilib\\]/,/#Include = \\/etc\\/pacman.d\\/mirrorlist/ s/^#//' "$pacman_conf"
+  if sudo sed -n '/#\[multilib\]/,/#Include = \/etc\/pacman.d\/mirrorlist/ p' "$pacman_conf" | grep -q '\[multilib\]'; then
+    sudo sed -i '/#\[multilib\]/,/#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' "$pacman_conf"
   else
     sudo bash -c "cat >>$pacman_conf <<'EOF'
 

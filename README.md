@@ -55,24 +55,23 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
       - `bottles` (run Windows apps without the shame of dual-booting)
 
 ### Initial Setup
-
 When running in full installation mode, bloater will:
-
 1. **Shell Setup**
    - Install Oh My Zsh framework
    - Set Zsh as default shell
-
-2. **VS Code**
+2. **Virtualization Setup**
+   - Enable and start libvirt service
+   - Add user to libvirt and kvm groups for VM management
+   - Load appropriate KVM module based on CPU type
+3. **System Tools**
+   - Configure Timeshift for automatic snapshots
+   - Configure Discord to skip host updates and enable devtools
+   - Set up PAM for Hyprlock fingerprint authentication (and some ricing)
+4. **VS Code**
    - Install 44 essential extensions
    - Set Material Theme Ocean
    - Apply Material Icon Theme
-
-3. **System Tools**
-   - Configure Timeshift for automatic snapshots
-   - Configure Discord to skip host updates
-   - Set up PAM for Hyprlock fingerprint authentication (and some ricing)
-
-4. **Boot Themes**
+5. **Boot Themes**
    - Remove unused display managers (SDDM, GDM, LightDM)
    - Install CyberGRUB-2077 GRUB theme
    - Install chika Plymouth theme

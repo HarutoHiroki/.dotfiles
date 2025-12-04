@@ -22,6 +22,17 @@ install-local-pkgbuild() {
   x pushd "$location"
   
   source ./PKGBUILD
+  
+  # Handle iptables-nft replacement for virtualization package
+  if [[ "$location" == *"virtualization"* ]] && pacman -Q iptables &>/dev/null && ! pacman -Q iptables-nft &>/dev/null; then
+    echo "Replacing iptables with iptables-nft..."
+    if [[ "$installflags" == *"--noconfirm"* ]]; then
+      v sudo pacman -Rdd --noconfirm iptables
+    else
+      v sudo pacman -Rdd iptables
+    fi
+  fi
+  
   x yay -S --sudoloop $installflags --asdeps "${depends[@]}"
   
   # Build and install the metapackage
@@ -86,7 +97,7 @@ if ! command -v yay >/dev/null 2>&1; then
   v install-yay
 fi
 
-# Define metapackages to install (like end-4's metapkgs array)
+# Define metapackages to install
 metapkgs=(
   "${BLOATER_ROOT}/bloat/deps/fonts"
   "${BLOATER_ROOT}/bloat/deps/development"
@@ -100,6 +111,7 @@ metapkgs=(
   "${BLOATER_ROOT}/bloat/deps/shell"
   "${BLOATER_ROOT}/bloat/deps/monitoring"
   "${BLOATER_ROOT}/bloat/deps/gaming"
+  "${BLOATER_ROOT}/bloat/deps/virtualization"
 )
 
 # Add GPU-specific package

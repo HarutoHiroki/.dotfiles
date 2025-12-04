@@ -112,6 +112,76 @@ else
   echo "zsh not found; skipping chsh."
 fi
 
+# Enable and configure libvirt for virtualization
+echo "Configuring libvirt virtualization..."
+run_cmd "sudo systemctl enable --now libvirtd"
+run_cmd "sudo usermod -aG libvirt,kvm ${TARGET_USER}"
+
+# Load appropriate KVM module based on CPU type
+echo "Loading KVM kernel module..."
+if grep -q "GenuineIntel" /proc/cpuinfo; then
+  KVM_MODULE_CMD="sudo modprobe kvm_intel"
+elif grep -q "AuthenticAMD" /proc/cpuinfo; then
+  KVM_MODULE_CMD="sudo modprobe kvm_amd"
+else
+  echo "Unknown CPU vendor, skipping KVM module load"
+  KVM_MODULE_CMD=""
+fi
+if [[ -n "$KVM_MODULE_CMD" ]]; then
+  run_cmd "$KVM_MODULE_CMD"
+fi
+
+# Configure Timeshift settings
+echo "Configuring Timeshift..."
+TIMESHIFT_CONFIG="/etc/timeshift/timeshift.json"
+TIMESHIFT_DEFAULT="/etc/timeshift/default.json"
+
+# Initialize config if needed
+run_cmd "sudo bash -c '[ ! -f \"$TIMESHIFT_CONFIG\" ] || [ ! -s \"$TIMESHIFT_CONFIG\" ] && { [ -f \"$TIMESHIFT_DEFAULT\" ] && cp \"$TIMESHIFT_DEFAULT\" \"$TIMESHIFT_CONFIG\" || echo \"{}\" > \"$TIMESHIFT_CONFIG\"; } || true'"
+
+# Configure Timeshift settings
+run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"true\" | .schedule_daily = \"true\" | .count_daily = \"5\" | .date_format = \"%Y-%m-%d %I:%M %p\"' \"$TIMESHIFT_CONFIG\" | sudo tee \"$TIMESHIFT_CONFIG.tmp\" > /dev/null && sudo mv \"$TIMESHIFT_CONFIG.tmp\" \"$TIMESHIFT_CONFIG\""
+
+# Configure Discord to skip host updates
+echo "Configuring Discord settings..."
+DISCORD_SETTINGS="${XDG_CONFIG_HOME}/discord/settings.json"
+run_cmd "mkdir -p \"${XDG_CONFIG_HOME}/discord\""
+
+# Create or update Discord settings
+if [[ -f "$DISCORD_SETTINGS" && -s "$DISCORD_SETTINGS" ]]; then
+  # File exists and has content, append to existing JSON
+  DISCORD_UPDATE_CMD="jq '. + {\"SKIP_HOST_UPDATE\": true, \"DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING\": true}' \"$DISCORD_SETTINGS\" > \"$DISCORD_SETTINGS.tmp\" && mv \"$DISCORD_SETTINGS.tmp\" \"$DISCORD_SETTINGS\""
+else
+  # File doesn't exist or is empty, create new JSON
+  DISCORD_UPDATE_CMD="echo '{\"SKIP_HOST_UPDATE\": true, \"DANGEROUS_ENABLE_DEVTOOLS_ONLY_ENABLE_IF_YOU_KNOW_WHAT_YOURE_DOING\": true}' > \"$DISCORD_SETTINGS\""
+fi
+run_cmd "$DISCORD_UPDATE_CMD"
+
+# Configure PAM for Hyprlock with fingerprint support
+echo "Configuring PAM for Hyprlock fingerprint authentication..."
+HYPRLOCK_PAM="/etc/pam.d/hyprlock"
+
+# Check if already configured, otherwise create the PAM file
+if [[ "$MODE" == "manual" ]]; then
+  PAM_CONFIG_CMD="if sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null; then echo 'Hyprlock PAM fingerprint already configured'; else sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
+auth     sufficient pam_fprintd.so
+auth     include    system-auth
+account  include    system-auth
+password include    system-auth
+session  include    system-auth
+PAMEOF
+fi"
+else
+  PAM_CONFIG_CMD="sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null || sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
+auth     sufficient pam_fprintd.so
+auth     include    system-auth
+account  include    system-auth
+password include    system-auth
+session  include    system-auth
+PAMEOF"
+fi
+run_cmd "$PAM_CONFIG_CMD"
+
 # Install VS Code ~~bloat~~ extensions
 echo "Installing VS Code extensions..."
 VSCODE_EXTENSIONS=(
@@ -161,10 +231,12 @@ zignd.html-css-class-completion
 ziyasal.vscode-open-in-github
 )
 
+# Build command with all extensions
+VSCODE_EXT_CMD="code"
 for ext in "${VSCODE_EXTENSIONS[@]}"; do
-  VSCODE_EXT_CMD="code --install-extension ${ext}"
-  run_cmd "$VSCODE_EXT_CMD"
+  VSCODE_EXT_CMD="$VSCODE_EXT_CMD --install-extension ${ext}"
 done
+run_cmd "$VSCODE_EXT_CMD"
 
 # Configure VS Code settings (theme and icons)
 echo "Configuring VS Code theme and icons..."
@@ -176,57 +248,6 @@ run_cmd "mkdir -p \"$VSCODE_SETTINGS_DIR\""
 # Update or create settings.json with theme preferences
 VSCODE_THEME_CMD="jq '. + {\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' \"$VSCODE_SETTINGS_FILE\" 2>/dev/null > \"$VSCODE_SETTINGS_FILE.tmp\" && mv \"$VSCODE_SETTINGS_FILE.tmp\" \"$VSCODE_SETTINGS_FILE\" || echo '{\"workbench.colorTheme\": \"Material Theme Ocean\", \"workbench.iconTheme\": \"material-icon-theme\"}' > \"$VSCODE_SETTINGS_FILE\""
 run_cmd "$VSCODE_THEME_CMD"
-
-# Configure Timeshift settings
-echo "Configuring Timeshift..."
-TIMESHIFT_CONFIG="/etc/timeshift/timeshift.json"
-TIMESHIFT_DEFAULT="/etc/timeshift/default.json"
-
-# Initialize config if needed
-run_cmd "sudo bash -c '[ ! -f \"$TIMESHIFT_CONFIG\" ] || [ ! -s \"$TIMESHIFT_CONFIG\" ] && { [ -f \"$TIMESHIFT_DEFAULT\" ] && cp \"$TIMESHIFT_DEFAULT\" \"$TIMESHIFT_CONFIG\" || echo \"{}\" > \"$TIMESHIFT_CONFIG\"; } || true'"
-
-# Configure Timeshift settings
-run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"true\" | .schedule_daily = \"true\" | .count_daily = \"5\" | .date_format = \"%Y-%m-%d %I:%M %p\"' \"$TIMESHIFT_CONFIG\" | sudo tee \"$TIMESHIFT_CONFIG.tmp\" > /dev/null && sudo mv \"$TIMESHIFT_CONFIG.tmp\" \"$TIMESHIFT_CONFIG\""
-
-# Configure Discord to skip host updates
-echo "Configuring Discord settings..."
-DISCORD_SETTINGS="${XDG_CONFIG_HOME}/discord/settings.json"
-run_cmd "mkdir -p \"${XDG_CONFIG_HOME}/discord\""
-
-# Create or update Discord settings
-if [[ -f "$DISCORD_SETTINGS" && -s "$DISCORD_SETTINGS" ]]; then
-  # File exists and has content, append to existing JSON
-  DISCORD_UPDATE_CMD="jq '. + {\"SKIP_HOST_UPDATE\": true}' \"$DISCORD_SETTINGS\" > \"$DISCORD_SETTINGS.tmp\" && mv \"$DISCORD_SETTINGS.tmp\" \"$DISCORD_SETTINGS\""
-else
-  # File doesn't exist or is empty, create new JSON
-  DISCORD_UPDATE_CMD="echo '{\"SKIP_HOST_UPDATE\": true}' > \"$DISCORD_SETTINGS\""
-fi
-run_cmd "$DISCORD_UPDATE_CMD"
-
-# Configure PAM for Hyprlock with fingerprint support
-echo "Configuring PAM for Hyprlock fingerprint authentication..."
-HYPRLOCK_PAM="/etc/pam.d/hyprlock"
-
-# Check if already configured, otherwise create the PAM file
-if [[ "$MODE" == "manual" ]]; then
-  PAM_CONFIG_CMD="if sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null; then echo 'Hyprlock PAM fingerprint already configured'; else sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
-auth     sufficient pam_fprintd.so
-auth     include    system-auth
-account  include    system-auth
-password include    system-auth
-session  include    system-auth
-PAMEOF
-fi"
-else
-  PAM_CONFIG_CMD="sudo grep -q 'pam_fprintd.so' \"$HYPRLOCK_PAM\" 2>/dev/null || sudo tee \"$HYPRLOCK_PAM\" >/dev/null <<'PAMEOF'
-auth     sufficient pam_fprintd.so
-auth     include    system-auth
-account  include    system-auth
-password include    system-auth
-session  include    system-auth
-PAMEOF"
-fi
-run_cmd "$PAM_CONFIG_CMD"
 
 # Remove unused display managers
 echo "Removing unused display managers (none look good)..."

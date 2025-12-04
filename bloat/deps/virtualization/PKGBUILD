@@ -1,0 +1,17 @@
+pkgname=bloater-virtualization
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Virtualization Dependencies'
+arch=(any)
+license=(None)
+depends=(
+  qemu-full
+  libvirt
+  virt-manager
+  virt-viewer
+  spice-vdagent
+  edk2-ovmf
+  dnsmasq
+  iptables-nft
+  bridge-utils
+)

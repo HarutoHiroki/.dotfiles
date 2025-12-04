@@ -102,8 +102,12 @@ run_cmd "sudo usermod -aG docker ${TARGET_USER}"
 
 # Install oh-my-zsh and set zsh as default shell
 echo "Setting up Zsh..."
-OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
-run_cmd "$OHMYZSH_CMD"
+if [[ -d "$HOME/.oh-my-zsh" ]]; then
+  echo "oh-my-zsh already installed, skipping..."
+else
+  OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
+  run_cmd "$OHMYZSH_CMD"
+fi
 
 if [[ -z "$ZSH_PATH" ]]; then
   ZSH_PATH="$(command -v zsh || true)"

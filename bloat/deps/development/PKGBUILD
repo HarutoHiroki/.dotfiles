@@ -1,0 +1,12 @@
+pkgname=bloater-development
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Development Tools'
+arch=(any)
+license=(None)
+depends=(
+  git
+  seahorse
+  visual-studio-code-bin
+  zip
+)

@@ -1,0 +1,14 @@
+pkgname=bloater-network
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Network and VPN Tools'
+arch=(any)
+license=(None)
+depends=(
+  networkmanager-openvpn
+  nmap
+  openvpn
+  wireshark-cli
+  wireshark-qt
+  wireguard-tools
+)

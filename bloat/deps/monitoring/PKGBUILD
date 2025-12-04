@@ -1,0 +1,10 @@
+pkgname=bloater-monitoring
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater System Monitoring'
+arch=(any)
+license=(None)
+depends=(
+  btop
+  fastfetch
+)

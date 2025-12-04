@@ -1,0 +1,9 @@
+pkgname=bloater-browser
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Web Browser'
+arch=(any)
+license=(None)
+depends=(
+  vivaldi
+)

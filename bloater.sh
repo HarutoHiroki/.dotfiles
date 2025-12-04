@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
-set -u
+cd "$(dirname "$0")"
+REPO_ROOT="$(pwd)"
+export BLOATER_ROOT="$REPO_ROOT"
+
+set -e
+
+# Source lib files
+source ./bloat/lib/environment-variables.sh
+source ./bloat/lib/functions.sh
+
+# Default values
+TARGET_USER="${SUDO_USER:-$USER}"
+ZSH_PATH="$(command -v zsh || true)"
+OHMYZSH_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
 
 # Determine mode
 MODE="${1:-${MODE:-}}"
@@ -36,40 +49,11 @@ if [[ "$MODE" != "customize-only" && -z "$GPU_TYPE" ]]; then
   esac
 fi
 
-TARGET_USER="${SUDO_USER:-$USER}"
-ZSH_PATH="$(command -v zsh || true)"
-OHMYZSH_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh"
+# Prevent running as root
+prevent_sudo_or_root
 
-# --------------------- Helper Functions ---------------------
-
-run_cmd() {
-  local cmd="$1"
-  if [[ "$MODE" == "manual" ]]; then
-    echo
-    echo "About to run:"
-    echo "  $cmd"
-    read -rp "Run this command now? [Y/n] " yn
-    yn=${yn:-Y}
-    if [[ "${yn^^}" == "Y" || "${yn}" == "y" || "${yn}" == "" ]]; then
-      eval "$cmd"
-    else
-      echo "Skipped."
-    fi
-  else # unattended
-    echo "[RUNNING] $cmd"
-    eval "$cmd"
-  fi
-}
-
-# --------------------- Setup Variables ----------------------
-
-if [[ "$MODE" == "unattended" ]]; then
-  PACMAN_FLAGS="--noconfirm --needed"
-  YAY_FLAGS="--noconfirm"
-else
-  PACMAN_FLAGS="--needed"
-  YAY_FLAGS=""
-fi
+# Prevent running as root
+prevent_sudo_or_root
 
 echo "Bloater initializing..."
 echo "Running in mode: $MODE"
@@ -80,173 +64,37 @@ fi
 echo
 
 # ===========================================================
-# 1) Enable multilib
+# 1) Install dependencies
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-enable_multilib() {
-  local pacman_conf="/etc/pacman.conf"
-  if sudo grep -qE '^[[:space:]]*\[multilib\]' "$pacman_conf"; then
-    echo "multilib already enabled"
-    return 0
-  fi
-
-  echo "Enabling multilib"
-  if sudo sed -n '/#\[multilib\]/,/#Include = \/etc\/pacman.d\/mirrorlist/ p' "$pacman_conf" | grep -q '\[multilib\]'; then
-    sudo sed -i '/#\[multilib\]/,/#Include = \/etc\/pacman.d\/mirrorlist/ s/^#//' "$pacman_conf"
+  echo "Installing dependencies..."
+  echo
+  
+  # Export variables needed by install-deps.sh
+  export ask=$([[ "$MODE" == "manual" ]] && echo "true" || echo "false")
+  export SKIP_SYSUPDATE=false
+  export GPU_TYPE
+  
+  # Source the install-deps script (like end-4 does with ./setup install)
+  if [[ -f "${BLOATER_ROOT}/bloat/deps/install-deps.sh" ]]; then
+    source "${BLOATER_ROOT}/bloat/deps/install-deps.sh"
   else
-    sudo bash -c "cat >>$pacman_conf <<'EOF'
-
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-EOF"
+    echo "Error: install-deps.sh not found"
+    exit 1
   fi
-
-  echo "Refreshing pacman DB..."
-  run_cmd "sudo pacman -Syy"
-}
-
-run_cmd "enable_multilib"
+  
+  echo
+  echo "✓ Dependencies installed"
+  echo
 fi # End of part 1
 
 # ===========================================================
-# 2) Install pacman packages
+# 2) Initial Setup and Configurations
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-echo "Preparing to install approximately ALL the packages..."
-PACMAN_PACKAGES=$(cat <<'PKGS'
-# Fonts
-adobe-source-han-sans-jp-fonts
-adobe-source-han-serif-jp-fonts
-noto-fonts-cjk
-otf-ipaexfont
-ttf-jigmo
-ttf-vlgothic
-cantarell-fonts
-ttf-dejavu
 
-# Development
-git
-zip
-seahorse
-
-# X11
-xorg-xhost
-
-# Power management
-upower
-acpid
-powertop
-power-profiles-daemon
-
-# Browser
-vivaldi
-
-# Biometrics
-libfprint
-fprintd
-
-# Boot visuals
-plymouth
-
-# Shell
-zsh
-
-# Audio
-easyeffects
-
-# Containers
-docker
-
-# System monitoring
-btop
-fastfetch
-
-# Flatpak
-flatpak
-flatpak-kcm
-
-# Media / tools
-mpv
-imv
-fwupd
-
-# VPN
-openvpn
-networkmanager-openvpn
-wireguard-tools
-
-# Network tools
-nmap
-wireshark-cli
-wireshark-qt
-
-# Gaming
-wine
-lutris
-PKGS
-)
-
-PACMAN_CMD="sudo pacman -Syu ${PACMAN_FLAGS} $(echo \"$PACMAN_PACKAGES\" | sed '/^\s*#/d;/^\s*$/d' | tr '\n' ' ')"
-run_cmd "$PACMAN_CMD"
-
-# Add user to docker group
+# Add user to docker group (from bloater-system metapackage)
 run_cmd "sudo usermod -aG docker ${TARGET_USER}"
-fi # End of part 2
-
-# ===========================================================
-# 2b) Install GPU-specific packages
-# ===========================================================
-if [[ "$MODE" != "customize-only" && "$GPU_TYPE" != "skip" ]]; then
-if [[ "$GPU_TYPE" == "amd" ]]; then
-  GPU_PACKAGES=$(cat <<'GPUPKGS'
-mesa
-lib32-mesa
-mesa-vdpau
-lib32-mesa-vdpau
-vulkan-radeon
-lib32-vulkan-radeon
-glu
-lib32-glu
-vulkan-icd-loader
-lib32-vulkan-icd-loader
-GPUPKGS
-)
-  GPU_CMD="sudo pacman -S ${PACMAN_FLAGS} $(echo \"$GPU_PACKAGES\" | sed '/^\s*#/d;/^\s*$/d' | tr '\n' ' ')"
-  echo "Installing AMD graphics stack (smooth sailing ahead)..."
-  run_cmd "$GPU_CMD"
-elif [[ "$GPU_TYPE" == "nvidia" ]]; then
-  GPU_PACKAGES=$(cat <<'GPUPKGS'
-nvidia
-nvidia-utils
-lib32-nvidia-utils
-nvidia-settings
-vulkan-icd-loader
-lib32-vulkan-icd-loader
-glu
-lib32-glu
-GPUPKGS
-)
-  GPU_CMD="sudo pacman -S ${PACMAN_FLAGS} $(echo \"$GPU_PACKAGES\" | sed '/^\s*#/d;/^\s*$/d' | tr '\n' ' ')"
-  echo "Installing NVIDIA graphics stack (good luck soldier, you're gonna need it)..."
-  echo "Pro tip: If this breaks, we told you to go AMD"
-  run_cmd "$GPU_CMD"
-fi
-fi # End of part 2b
-
-# ===========================================================
-# 3) yay AUR installs
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
-echo "Installing AUR packages..."
-AUR_PACKAGES="feishin steam protonup-qt minecraft-launcher visual-studio-code-bin bottles"
-YAY_CMD="yay -S ${YAY_FLAGS} ${AUR_PACKAGES}"
-run_cmd "$YAY_CMD"
-fi # End of part 3
-
-# ===========================================================
-# 4) Initial Setup and Configurations
-# ===========================================================
-if [[ "$MODE" != "customize-only" ]]; then
 
 # Install oh-my-zsh and set zsh as default shell
 echo "Setting up Zsh..."
@@ -320,7 +168,7 @@ done
 
 # Configure VS Code settings (theme and icons)
 echo "Configuring VS Code theme and icons..."
-VSCODE_SETTINGS_DIR="$HOME/.config/Code/User"
+VSCODE_SETTINGS_DIR="${XDG_CONFIG_HOME}/Code/User"
 VSCODE_SETTINGS_FILE="$VSCODE_SETTINGS_DIR/settings.json"
 
 run_cmd "mkdir -p \"$VSCODE_SETTINGS_DIR\""
@@ -342,8 +190,8 @@ run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"tr
 
 # Configure Discord to skip host updates
 echo "Configuring Discord settings..."
-DISCORD_SETTINGS="$HOME/.config/discord/settings.json"
-run_cmd "mkdir -p \"$HOME/.config/discord\""
+DISCORD_SETTINGS="${XDG_CONFIG_HOME}/discord/settings.json"
+run_cmd "mkdir -p \"${XDG_CONFIG_HOME}/discord\""
 
 # Create or update Discord settings
 if [[ -f "$DISCORD_SETTINGS" && -s "$DISCORD_SETTINGS" ]]; then
@@ -403,10 +251,10 @@ CHIKA_CMD="git clone https://git.jamjar.ws/strat/chika_plymouth.git && sudo cp -
 UPDATE_PLYMOUTH_CMD="sudo plymouth-set-default-theme -R chika"
 run_cmd "$CHIKA_CMD"
 run_cmd "$UPDATE_PLYMOUTH_CMD"
-fi # End of part 4
+fi # End of part 3
 
 # ===========================================================
-# 5) Apply customizations
+# 4) Apply customizations
 # ===========================================================
 echo "Applying the secret sauce..."
 
@@ -416,17 +264,17 @@ if [[ -f "$HOME/.zshrc" ]]; then
   echo "Backing up existing .zshrc to .zshrc.backup.$(date +%Y%m%d_%H%M%S)"
   run_cmd "cp \"$HOME/.zshrc\" \"$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
-run_cmd "cp -f ./bloat_configs/.zshrc \"$HOME/\""
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.zshrc\" \"$HOME/\""
 
 # Copy wallpaper directory
 echo "Copying wallpaper directory..."
 run_cmd "mkdir -p \"$HOME/Wallpapers\""
-run_cmd "cp -r ./wallpaper/* \"$HOME/Wallpapers/\""
+run_cmd "cp -r \"${BLOATER_ROOT}/bloat/wallpaper\"/* \"$HOME/Wallpapers/\""
 
 # Copy illogical-impulse config
 echo "Copying custom illogical-impulse config..."
-II_CONFIG_DIR="$HOME/.config/illogical-impulse"
-run_cmd "cp -f ./bloat_configs/.config/illogical-impulse/config.json \"$II_CONFIG_DIR/\""
+II_CONFIG_DIR="${XDG_CONFIG_HOME}/illogical-impulse"
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/illogical-impulse/config.json\" \"$II_CONFIG_DIR/\""
 
 # Update wallpaper path to current user
 echo "Updating wallpaper path for current user..."
@@ -434,34 +282,34 @@ run_cmd "sed -i 's|/home/[^/]*/Wallpapers/|/home/'\"$TARGET_USER\"'/Wallpapers/|
 
 # Monitor config
 echo "Configuring monitor settings..."
-HYPR_CONF_FILE="$HOME/.config/hypr/monitors.conf"
+HYPR_CONF_FILE="${XDG_CONFIG_HOME}/hypr/monitors.conf"
 MONITOR_LINE='monitor = , preferred, auto, 1.333334'
 run_cmd "echo \"$MONITOR_LINE\" >> \"$HYPR_CONF_FILE\""
 
 # Modify Kitty to use zsh
 echo "Updating Kitty terminal to use Zsh..."
-KITTY_FILE="$HOME/.config/kitty/kitty.conf"
+KITTY_FILE="${XDG_CONFIG_HOME}/kitty/kitty.conf"
 run_cmd "sed -i \"s/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/\" \"$KITTY_FILE\""
 
 # Modify Hyprland keybinds to add Vivaldi
 echo "Prioritizing Vivaldi in keybinds..."
-HYPR_KEYBINDS_FILE="$HOME/.config/hypr/hyprland/keybinds.conf"
+HYPR_KEYBINDS_FILE="${XDG_CONFIG_HOME}/hypr/hyprland/keybinds.conf"
 run_cmd "sed -i \"s|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|\" \"$HYPR_KEYBINDS_FILE\""
 
 # Copy Hyprlock helper script
 echo "Copying Hyprlock helper script..."
-HYPRLOCK_DIR="$HOME/.config/hypr/hyprlock"
+HYPRLOCK_DIR="${XDG_CONFIG_HOME}/hypr/hyprlock"
 run_cmd "mkdir -p \"$HYPRLOCK_DIR\""
-run_cmd "cp -f ./bloat_configs/.config/hypr/hyprlock/get_wallpaper_path.sh \"$HYPRLOCK_DIR/\""
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock/get_wallpaper_path.sh\" \"$HYPRLOCK_DIR/\""
 
 # Copy custom Hyprlock config
 echo "Copying custom Hyprlock config..."
-HYPRLOCK_CONF="$HOME/.config/hypr/hyprlock.conf"
+HYPRLOCK_CONF="${XDG_CONFIG_HOME}/hypr/hyprlock.conf"
 if [[ -f "$HYPRLOCK_CONF" ]]; then
   echo "Backing up existing hyprlock.conf to hyprlock.conf.backup.$(date +%Y%m%d_%H%M%S)"
   run_cmd "cp \"$HYPRLOCK_CONF\" \"$HYPRLOCK_CONF.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
-run_cmd "cp -f ./bloat_configs/.config/hypr/hyprlock.conf \"$HYPRLOCK_CONF\""
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock.conf\" \"$HYPRLOCK_CONF\""
 
 # ===========================================================
 # Add your own customizations here!
@@ -469,7 +317,7 @@ run_cmd "cp -f ./bloat_configs/.config/hypr/hyprlock.conf \"$HYPRLOCK_CONF\""
 # ===========================================================
 
 echo "✓ Customizations applied!"
-# End of part 5
+# End of part 4
 
 echo
 echo "Bloating complete! Your system is now beautifully bloated."

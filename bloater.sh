@@ -317,6 +317,10 @@ echo "Copying wallpaper directory..."
 run_cmd "mkdir -p \"$HOME/Wallpapers\""
 run_cmd "cp -r \"${BLOATER_ROOT}/bloat/wallpaper\"/* \"$HOME/Wallpapers/\""
 
+# Set initial wallpaper
+echo "Setting initial wallpaper..."
+run_cmd "bash -c '~/.config/quickshell/ii/scripts/colors/switchwall.sh ~/Wallpapers/Kayoko.jpg & WALLPAPER_PID=\$!; sleep 10; kill \$WALLPAPER_PID 2>/dev/null; pkill -P \$WALLPAPER_PID 2>/dev/null; exit 0' || true"
+
 # Copy illogical-impulse config
 echo "Copying custom illogical-impulse config..."
 II_CONFIG_DIR="${XDG_CONFIG_HOME}/illogical-impulse"

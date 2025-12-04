@@ -56,3 +56,47 @@ prevent_sudo_or_root() {
     exit 1
   fi
 }
+
+# Store PID in a global variable that can be accessed by trap
+declare -g SUDO_KEEPALIVE_PID=""
+
+# Initialize sudo session and keep it alive in background
+sudo_init_keepalive() {
+  # Check if sudo is available
+  if ! command -v sudo >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Skip if already initialized
+  if [[ -n "$SUDO_KEEPALIVE_PID" ]] && kill -0 "$SUDO_KEEPALIVE_PID" 2>/dev/null; then
+    return 0
+  fi
+
+  # Prompt for sudo password once at the beginning
+  echo -e "${STY_CYAN}[bloater]: Requesting sudo privileges for installation...${STY_RST}"
+  if ! sudo -v; then
+    echo -e "${STY_RED}[bloater]: Failed to obtain sudo privileges. Aborting...${STY_RST}"
+    exit 1
+  fi
+
+  # Start background process to keep sudo session alive
+  # This updates the sudo timestamp every 60 seconds
+  (
+    while true; do
+      sleep 60
+      sudo -v 2>/dev/null || exit 0
+    done
+  ) &
+  SUDO_KEEPALIVE_PID=$!
+
+  echo -e "${STY_GREEN}[bloater]: Sudo session initialized and will be kept alive (PID: $SUDO_KEEPALIVE_PID)${STY_RST}"
+}
+
+# Stop the sudo keepalive background process
+sudo_stop_keepalive() {
+  if [[ -n "$SUDO_KEEPALIVE_PID" ]] && kill -0 "$SUDO_KEEPALIVE_PID" 2>/dev/null; then
+    kill "$SUDO_KEEPALIVE_PID" 2>/dev/null
+    wait "$SUDO_KEEPALIVE_PID" 2>/dev/null
+    SUDO_KEEPALIVE_PID=""
+  fi
+}

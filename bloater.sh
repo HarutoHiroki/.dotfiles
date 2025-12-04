@@ -52,9 +52,6 @@ fi
 # Prevent running as root
 prevent_sudo_or_root
 
-# Prevent running as root
-prevent_sudo_or_root
-
 echo "Bloater initializing..."
 echo "Running in mode: $MODE"
 if [[ "$MODE" != "customize-only" ]]; then
@@ -62,6 +59,13 @@ if [[ "$MODE" != "customize-only" ]]; then
   echo "Target user for shell shenanigans: $TARGET_USER"
 fi
 echo
+
+# Initialize sudo keepalive for the entire process
+if [[ "$MODE" != "customize-only" ]]; then
+  sudo_init_keepalive
+  # Set trap to cleanup when script exits
+  trap sudo_stop_keepalive EXIT INT TERM
+fi
 
 # ===========================================================
 # 1) Install dependencies
@@ -251,7 +255,7 @@ run_cmd "$VSCODE_THEME_CMD"
 
 # Remove unused display managers
 echo "Removing unused display managers (none look good)..."
-REMOVE_CMD="sudo pacman -R ${PACMAN_FLAGS} sddm gdm lightdm"
+REMOVE_CMD="sudo pacman -Rns ${PACMAN_FLAGS} sddm gdm lightdm || true"
 run_cmd "$REMOVE_CMD"
 
 echo "Installing bootup themes..."

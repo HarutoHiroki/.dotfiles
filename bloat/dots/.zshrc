@@ -112,8 +112,8 @@ alias dotsupdate="cd ~/.cache/dots-hyprland && git stash && git pull && ./setup 
 # Download Znap, if it's not there yet.
 [[ -r ~/zshRepos/znap/znap.zsh ]] ||
     git clone --depth 1 -- \
-        https://github.com/marlonrichert/zsh-snap.git ~/zshRepos/znap
-source ~/zshRepos/znap/znap.zsh  # Start Znap
+        https://github.com/marlonrichert/zsh-snap.git ~/.config/zsh/custom/znap
+source ~/.config/zsh/custom/znap.zsh  # Start Znap
 znap source marlonrichert/zsh-autocomplete    # Autocomplete
 znap source zsh-users/zsh-autosuggestions     # Autosuggestions
 znap source zsh-users/zsh-syntax-highlighting # Highlighting

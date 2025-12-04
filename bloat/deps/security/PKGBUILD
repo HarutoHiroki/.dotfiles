@@ -1,0 +1,12 @@
+pkgname=bloater-security
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Security and Boot'
+arch=(any)
+license=(None)
+depends=(
+  fprintd
+  libfprint
+  plymouth
+  xorg-xhost
+)

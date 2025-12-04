@@ -1,0 +1,12 @@
+pkgname=bloater-power
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Power Management'
+arch=(any)
+license=(None)
+depends=(
+  acpid
+  power-profiles-daemon
+  powertop
+  upower
+)

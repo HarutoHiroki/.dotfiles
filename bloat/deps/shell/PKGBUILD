@@ -1,0 +1,9 @@
+pkgname=bloater-shell
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Shell'
+arch=(any)
+license=(None)
+depends=(
+  zsh
+)

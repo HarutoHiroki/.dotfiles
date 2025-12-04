@@ -1,0 +1,12 @@
+pkgname=bloater-containers
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Containers and Virtualization'
+arch=(any)
+license=(None)
+depends=(
+  bottles
+  docker
+  flatpak
+  flatpak-kcm
+)

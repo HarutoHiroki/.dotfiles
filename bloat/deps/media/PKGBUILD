@@ -1,0 +1,11 @@
+pkgname=bloater-media
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Media Players and Tools'
+arch=(any)
+license=(None)
+depends=(
+  fwupd
+  imv
+  mpv
+)

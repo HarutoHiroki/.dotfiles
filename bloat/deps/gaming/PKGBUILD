@@ -1,0 +1,13 @@
+pkgname=bloater-gaming
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Gaming Dependencies'
+arch=(any)
+license=(None)
+depends=(
+  lutris
+  minecraft-launcher
+  protonup-qt
+  steam
+  wine
+)

@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+# Bloater quick install script
+
+set -e
+
+STY_RED='\033[0;31m'
+STY_GREEN='\033[0;32m'
+STY_YELLOW='\033[0;33m'
+STY_BLUE='\033[0;34m'
+STY_CYAN='\033[0;36m'
+STY_BOLD='\033[1m'
+STY_RST='\033[0m'
+
+REPO_URL="https://github.com/HarutoHiroki/.dotfiles.git"
+INSTALL_DIR="$HOME/.dotfiles"
+
+echo -e "${STY_CYAN}${STY_BOLD}"
+echo "╔═══════════════════════════════════════════╗"
+echo "║                                           ║"
+echo "║          BLOATER INSTALLER                ║"
+echo "║     Your system, beautifully bloated      ║"
+echo "║                                           ║"
+echo "╚═══════════════════════════════════════════╝"
+echo -e "${STY_RST}"
+echo
+
+# Check if running on Arch Linux
+if ! command -v pacman >/dev/null 2>&1; then
+  echo -e "${STY_RED}Error: This script requires Arch Linux (pacman not found)${STY_RST}"
+  exit 1
+fi
+
+# Check if git is installed
+if ! command -v git >/dev/null 2>&1; then
+  echo -e "${STY_YELLOW}Git not found, installing...${STY_RST}"
+  sudo pacman -S --needed --noconfirm git
+fi
+
+# Check for existing installation
+if [[ -d "$INSTALL_DIR" ]]; then
+  echo -e "${STY_YELLOW}Existing installation found at $INSTALL_DIR${STY_RST}"
+  read -rp "Remove and reinstall? [y/N] " response
+  case "$response" in
+    [yY])
+      echo "Removing existing installation..."
+      rm -rf "$INSTALL_DIR"
+      ;;
+    *)
+      echo "Updating existing installation..."
+      cd "$INSTALL_DIR"
+      git pull
+      ./bloater.sh
+      exit 0
+      ;;
+  esac
+fi
+
+# Check if end-4/dots-hyprland is installed
+if [[ ! -d "$HOME/.config/illogical-impulse" ]]; then
+  echo -e "${STY_RED}${STY_BOLD}Error: end-4/dots-hyprland (illogical-impulse) not found!${STY_RST}"
+  echo -e "${STY_YELLOW}Bloater requires illogical-impulse as a base configuration.${STY_RST}"
+  echo
+  echo -e "${STY_CYAN}Please install end-4/dots-hyprland first:${STY_RST}"
+  echo -e "${STY_CYAN}  git clone https://github.com/end-4/dots-hyprland.git${STY_RST}"
+  echo -e "${STY_CYAN}  cd dots-hyprland${STY_RST}"
+  echo -e "${STY_CYAN}  ./setup install${STY_RST}"
+  echo -e "${STY_CYAN}or run bash <(curl -s https://ii.clsty.link/get)${STY_RST}"
+  echo
+  echo -e "${STY_CYAN}Then run this bloater installer again.${STY_RST}"
+  exit 1
+fi
+
+# Clone repository
+echo -e "${STY_CYAN}Cloning bloater repository...${STY_RST}"
+git clone "$REPO_URL" "$INSTALL_DIR"
+
+cd "$INSTALL_DIR"
+
+# Full installation
+echo
+echo -e "${STY_BOLD}Select installation mode:${STY_RST}"
+echo "  1) YOLO mode     - automatic installation (--noconfirm)"
+echo "  2) Paranoid mode - prompt before each step"
+read -rp "Choice [1-2]: " mode_choice
+
+case "$mode_choice" in
+  1) MODE="unattended" ;;
+  2) MODE="manual" ;;
+  *) echo "Defaulting to paranoid mode"; MODE="manual" ;;
+esac
+
+echo
+echo -e "${STY_BOLD}Select GPU type:${STY_RST}"
+echo "  1) AMD"
+echo "  2) NVIDIA"
+echo "  3) Skip GPU driver installation"
+read -rp "Choice [1-3]: " gpu_choice
+
+case "$gpu_choice" in
+  1) GPU="amd" ;;
+  2) GPU="nvidia" ;;
+  3) GPU="skip" ;;
+  *) echo "Defaulting to AMD"; GPU="amd" ;;
+esac
+
+# Run bloater
+./bloater.sh "$MODE" "$GPU"
+
+echo
+echo -e "${STY_GREEN}${STY_BOLD}"
+echo "╔═══════════════════════════════════════════╗"
+echo "║                                           ║"
+echo "║     Installation Complete!                ║"
+echo "║     Time to reboot and enjoy!             ║"
+echo "║                                           ║"
+echo "╚═══════════════════════════════════════════╝"
+echo -e "${STY_RST}"
+echo
+echo -e "${STY_CYAN}Dotfiles installed to: $INSTALL_DIR${STY_RST}"
+echo -e "${STY_CYAN}To reconfigure: cd $INSTALL_DIR && ./bloater.sh${STY_RST}"
+echo

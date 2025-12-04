@@ -1,0 +1,16 @@
+pkgname=bloater-fonts
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Fonts (Japanese and compatibility fonts)'
+arch=(any)
+license=(None)
+depends=(
+  adobe-source-han-sans-jp-fonts
+  adobe-source-han-serif-jp-fonts
+  cantarell-fonts
+  noto-fonts-cjk
+  otf-ipaexfont
+  ttf-dejavu
+  ttf-jigmo
+  ttf-vlgothic
+)

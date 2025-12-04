@@ -1,0 +1,10 @@
+pkgname=bloater-audio
+pkgver=1.0
+pkgrel=1
+pkgdesc='Bloater Audio Tools'
+arch=(any)
+license=(None)
+depends=(
+  easyeffects
+  feishin
+)

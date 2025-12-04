@@ -76,6 +76,9 @@ git clone "$REPO_URL" "$INSTALL_DIR"
 
 cd "$INSTALL_DIR"
 
+# Make bloater.sh executable
+chmod +x bloater.sh
+
 # Full installation
 echo
 echo -e "${STY_BOLD}Select installation mode:${STY_RST}"

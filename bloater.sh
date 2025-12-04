@@ -266,7 +266,7 @@ echo "Installing bootup themes..."
 
 # Install CyberGRUB-2077 theme
 echo "Installing CyberGRUB-2077 theme..."
-CYBERGRUB_CMD="git clone https://github.com/adnksharp/CyberGRUB-2077.git && sudo ./CyberGRUB-2077/install.sh && rm -rf CyberGRUB-2077"
+CYBERGRUB_CMD="git clone https://github.com/adnksharp/CyberGRUB-2077.git && cd CyberGRUB-2077 && sudo ./install.sh && cd .. && rm -rf CyberGRUB-2077"
 run_cmd "$CYBERGRUB_CMD"
 
 # Add plymouth to mkinitcpio.conf HOOKS

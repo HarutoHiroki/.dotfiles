@@ -171,4 +171,6 @@ All customizations will automatically respect your chosen mode (paranoid/YOLO) a
 ## Credits
 
 - Package install script inspired by end-4's `dist-arch`
+- CyberGRUB Grub Theme by [adnksharp](https://github.com/adnksharp/CyberGRUB-2077)
+- Chika Plymouth Theme by [strat](https://git.jamjar.ws/strat/chika_plymouth.git)
 - Created by [HarutoHiroki](https://github.com/HarutoHiroki)

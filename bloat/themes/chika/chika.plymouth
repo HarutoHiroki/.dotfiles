@@ -1,0 +1,9 @@
+[Plymouth Theme]
+Name=chika
+Description=CHIKA!
+Comment=chikatto chika chika
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/chika
+ScriptFile=/usr/share/plymouth/themes/chika/chika.script

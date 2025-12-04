@@ -266,8 +266,22 @@ echo "Installing bootup themes..."
 
 # Install CyberGRUB-2077 theme
 echo "Installing CyberGRUB-2077 theme..."
-CYBERGRUB_CMD="git clone https://github.com/adnksharp/CyberGRUB-2077.git && cd CyberGRUB-2077 && sudo ./install.sh && cd .. && rm -rf CyberGRUB-2077"
-run_cmd "$CYBERGRUB_CMD"
+GRUB_THEMES_DIR="/boot/grub/themes"
+CYBERGRUB_THEME_DIR="${GRUB_THEMES_DIR}/CyberGRUB-2077"
+
+# Create themes directory if it doesn't exist
+run_cmd "sudo mkdir -p \"${GRUB_THEMES_DIR}\""
+
+# Copy theme files from bloat/themes
+run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/CyberGRUB-2077\" \"${GRUB_THEMES_DIR}/\""
+
+# Update GRUB config to use the theme
+GRUB_CFG="/etc/default/grub"
+GRUB_THEME_LINE="GRUB_THEME=\"${CYBERGRUB_THEME_DIR}/theme.txt\""
+run_cmd "sudo sed -i -E 's|^#?GRUB_THEME=.*|${GRUB_THEME_LINE}|' \"${GRUB_CFG}\" || echo '${GRUB_THEME_LINE}' | sudo tee -a \"${GRUB_CFG}\" > /dev/null"
+
+# Update GRUB
+run_cmd "sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
 # Add plymouth to mkinitcpio.conf HOOKS
 echo "Adding plymouth to mkinitcpio.conf..."
@@ -276,10 +290,10 @@ run_cmd "$MKINIT_PLYMOUTH_CMD"
 
 # Install chika Plymouth theme
 echo "Installing chika Plymouth theme..."
-CHIKA_CMD="git clone https://git.jamjar.ws/strat/chika_plymouth.git && sudo cp -r chika_plymouth/theme /usr/share/plymouth/themes/chika && rm -rf chika_plymouth"
-UPDATE_PLYMOUTH_CMD="sudo plymouth-set-default-theme -R chika"
-run_cmd "$CHIKA_CMD"
-run_cmd "$UPDATE_PLYMOUTH_CMD"
+PLYMOUTH_THEMES_DIR="/usr/share/plymouth/themes"
+run_cmd "sudo mkdir -p \"${PLYMOUTH_THEMES_DIR}/chika\""
+run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/chika\"/* \"${PLYMOUTH_THEMES_DIR}/chika/\""
+run_cmd "sudo plymouth-set-default-theme -R chika"
 fi # End of part 3
 
 # ===========================================================

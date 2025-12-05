@@ -81,6 +81,7 @@ When running in full installation mode, bloater will:
    - Copies wallpaper directory to `~/Wallpapers/` (WORLD POMUFICATION)
    - Copies custom illogical-impulse `config.json` with automatic wallpaper path updates
    - Configures Hyprland monitor settings with oddly specific 1.333334 scaling
+   - Also configures XWayland to not scale
    - Updates Kitty terminal to use Zsh instead of Fish (sorry fish fans)
    - Modifies Hyprland keybinds to prioritize Vivaldi browser (Chrome who?)
    - Copies Hyprlock config file (cuz original dots didn't customize it)

@@ -18,10 +18,10 @@ OHMYZSH_INSTALL_URL="https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/to
 MODE="${1:-${MODE:-}}"
 
 if [[ -z "$MODE" ]]; then
-  echo "Select your flavor of chaos:"
-  echo "  1) YOLO mode              - run everything automatically, living dangerously with --noconfirm"
-  echo "  2) Paranoid mode          - prompt before each command (trust issues are valid)"
-  echo "  3) Dots changes only mode - only apply visual customizations (first install or after updates)"
+  echo -e "${STY_CYAN}Select your flavor of chaos:${STY_RST}"
+  echo -e "  ${STY_GREEN}1)${STY_RST} YOLO mode              - run everything automatically, living dangerously with --noconfirm"
+  echo -e "  ${STY_YELLOW}2)${STY_RST} Paranoid mode          - prompt before each command (trust issues are valid)"
+  echo -e "  ${STY_BLUE}3)${STY_RST} Dots changes only mode - only apply visual customizations (first install or after updates)"
   read -rp "Enter choice [1-3]: " choice
   case "$choice" in
     1) MODE="unattended" ;;
@@ -36,10 +36,10 @@ GPU_TYPE="${2:-${GPU_TYPE:-}}"
 
 if [[ "$MODE" != "customize-only" && -z "$GPU_TYPE" ]]; then
   echo
-  echo "Choose your GPU allegiance:"
-  echo "  1) AMD     - The open source champions (smooth sailing ahead)"
-  echo "  2) NVIDIA  - The proprietary overlords (prepare for driver hell)"
-  echo "  3) Skip    - I'll handle my own GPU drivers (brave soul)"
+  echo -e "${STY_CYAN}Choose your GPU allegiance:${STY_RST}"
+  echo -e "  ${STY_GREEN}1)${STY_RST} AMD     - The open source champions (smooth sailing ahead)"
+  echo -e "  ${STY_RED}2)${STY_RST} NVIDIA  - The proprietary overlords (prepare for driver hell)"
+  echo -e "  ${STY_YELLOW}3)${STY_RST} Skip    - I'll handle my own GPU drivers (brave soul)"
   read -rp "Enter choice [1-3]: " gpu_choice
   case "$gpu_choice" in
     1) GPU_TYPE="amd" ;;
@@ -52,11 +52,11 @@ fi
 # Prevent running as root
 prevent_sudo_or_root
 
-echo "Bloater initializing..."
-echo "Running in mode: $MODE"
+echo -e "${STY_BOLD}${STY_CYAN}Bloater initializing...${STY_RST}"
+echo -e "${STY_BLUE}Running in mode:${STY_RST} ${STY_YELLOW}$MODE${STY_RST}"
 if [[ "$MODE" != "customize-only" ]]; then
-  echo "GPU type: $GPU_TYPE"
-  echo "Target user for shell shenanigans: $TARGET_USER"
+  echo -e "${STY_BLUE}GPU type:${STY_RST} ${STY_GREEN}$GPU_TYPE${STY_RST}"
+  echo -e "${STY_BLUE}Target user for shell shenanigans:${STY_RST} ${STY_CYAN}$TARGET_USER${STY_RST}"
 fi
 echo
 
@@ -71,7 +71,7 @@ fi
 # 1) Install dependencies
 # ===========================================================
 if [[ "$MODE" != "customize-only" ]]; then
-  echo "Installing dependencies..."
+  echo -e "${STY_BOLD}${STY_YELLOW}Installing dependencies...${STY_RST}"
   echo
   
   # Export variables needed by install-deps.sh
@@ -83,12 +83,12 @@ if [[ "$MODE" != "customize-only" ]]; then
   if [[ -f "${BLOATER_ROOT}/bloat/deps/install-deps.sh" ]]; then
     source "${BLOATER_ROOT}/bloat/deps/install-deps.sh"
   else
-    echo "Error: install-deps.sh not found"
+    echo -e "${STY_RED}Error: install-deps.sh not found${STY_RST}"
     exit 1
   fi
   
   echo
-  echo "✓ Dependencies installed"
+  echo -e "${STY_GREEN}✓ Dependencies installed${STY_RST}"
   echo
 fi # End of part 1
 
@@ -101,9 +101,9 @@ if [[ "$MODE" != "customize-only" ]]; then
 run_cmd "sudo usermod -aG docker ${TARGET_USER}"
 
 # Install oh-my-zsh and set zsh as default shell
-echo "Setting up Zsh..."
+echo -e "${STY_CYAN}Setting up Zsh...${STY_RST}"
 if [[ -d "$HOME/.oh-my-zsh" ]]; then
-  echo "oh-my-zsh already installed, skipping..."
+  echo -e "${STY_YELLOW}oh-my-zsh already installed, skipping...${STY_RST}"
 else
   OHMYZSH_CMD="env RUNZSH=no CHSH=no sh -c \"\$(curl -fsSL ${OHMYZSH_INSTALL_URL})\""
   run_cmd "$OHMYZSH_CMD"
@@ -117,22 +117,22 @@ if [[ -n "$ZSH_PATH" ]]; then
   CHSH_CMD="sudo chsh -s ${ZSH_PATH} ${TARGET_USER}"
   run_cmd "$CHSH_CMD"
 else
-  echo "zsh not found; skipping chsh."
+  echo -e "${STY_RED}zsh not found; skipping chsh.${STY_RST}"
 fi
 
 # Enable and configure libvirt for virtualization
-echo "Configuring libvirt virtualization..."
+echo -e "${STY_CYAN}Configuring libvirt virtualization...${STY_RST}"
 run_cmd "sudo systemctl enable --now libvirtd"
 run_cmd "sudo usermod -aG libvirt,kvm ${TARGET_USER}"
 
 # Load appropriate KVM module based on CPU type
-echo "Loading KVM kernel module..."
+echo -e "${STY_CYAN}Loading KVM kernel module...${STY_RST}"
 if grep -q "GenuineIntel" /proc/cpuinfo; then
   KVM_MODULE_CMD="sudo modprobe kvm_intel"
 elif grep -q "AuthenticAMD" /proc/cpuinfo; then
   KVM_MODULE_CMD="sudo modprobe kvm_amd"
 else
-  echo "Unknown CPU vendor, skipping KVM module load"
+  echo -e "${STY_YELLOW}Unknown CPU vendor, skipping KVM module load${STY_RST}"
   KVM_MODULE_CMD=""
 fi
 if [[ -n "$KVM_MODULE_CMD" ]]; then
@@ -140,7 +140,7 @@ if [[ -n "$KVM_MODULE_CMD" ]]; then
 fi
 
 # Configure Timeshift settings
-echo "Configuring Timeshift..."
+echo -e "${STY_CYAN}Configuring Timeshift...${STY_RST}"
 TIMESHIFT_CONFIG="/etc/timeshift/timeshift.json"
 TIMESHIFT_DEFAULT="/etc/timeshift/default.json"
 
@@ -151,7 +151,7 @@ run_cmd "sudo bash -c '[ ! -f \"$TIMESHIFT_CONFIG\" ] || [ ! -s \"$TIMESHIFT_CON
 run_cmd "sudo jq '.btrfs_mode = \"true\" | .include_btrfs_home_for_backup = \"true\" | .schedule_daily = \"true\" | .count_daily = \"5\" | .date_format = \"%Y-%m-%d %I:%M %p\"' \"$TIMESHIFT_CONFIG\" | sudo tee \"$TIMESHIFT_CONFIG.tmp\" > /dev/null && sudo mv \"$TIMESHIFT_CONFIG.tmp\" \"$TIMESHIFT_CONFIG\""
 
 # Configure Discord to skip host updates
-echo "Configuring Discord settings..."
+echo -e "${STY_CYAN}Configuring Discord settings...${STY_RST}"
 DISCORD_SETTINGS="${XDG_CONFIG_HOME}/discord/settings.json"
 run_cmd "mkdir -p \"${XDG_CONFIG_HOME}/discord\""
 
@@ -166,7 +166,7 @@ fi
 run_cmd "$DISCORD_UPDATE_CMD"
 
 # Configure PAM for Hyprlock with fingerprint support
-echo "Configuring PAM for Hyprlock fingerprint authentication..."
+echo -e "${STY_CYAN}Configuring PAM for Hyprlock fingerprint authentication...${STY_RST}"
 HYPRLOCK_PAM="/etc/pam.d/hyprlock"
 
 # Check if already configured, otherwise create the PAM file
@@ -191,7 +191,7 @@ fi
 run_cmd "$PAM_CONFIG_CMD"
 
 # Install VS Code ~~bloat~~ extensions
-echo "Installing VS Code extensions..."
+echo -e "${STY_CYAN}Installing VS Code extensions...${STY_RST}"
 VSCODE_EXTENSIONS=(
 aaron-bond.better-comments
 alefragnani.project-manager
@@ -247,7 +247,7 @@ done
 run_cmd "$VSCODE_EXT_CMD"
 
 # Configure VS Code settings (theme and icons)
-echo "Configuring VS Code theme and icons..."
+echo -e "${STY_CYAN}Configuring VS Code theme and icons...${STY_RST}"
 VSCODE_SETTINGS_DIR="${XDG_CONFIG_HOME}/Code/User"
 VSCODE_SETTINGS_FILE="$VSCODE_SETTINGS_DIR/settings.json"
 
@@ -258,14 +258,14 @@ VSCODE_THEME_CMD="jq '. + {\"workbench.colorTheme\": \"Material Theme Ocean\", \
 run_cmd "$VSCODE_THEME_CMD"
 
 # Remove unused display managers
-echo "Removing unused display managers (none look good)..."
+echo -e "${STY_CYAN}Removing unused display managers (none look good)...${STY_RST}"
 REMOVE_CMD="sudo pacman -Rns ${PACMAN_FLAGS} sddm gdm lightdm || true"
 run_cmd "$REMOVE_CMD"
 
-echo "Installing bootup themes..."
+echo -e "${STY_BOLD}${STY_YELLOW}Installing bootup themes...${STY_RST}"
 
 # Install CyberGRUB-2077 theme
-echo "Installing CyberGRUB-2077 theme..."
+echo -e "${STY_CYAN}Installing CyberGRUB-2077 theme...${STY_RST}"
 GRUB_THEMES_DIR="/boot/grub/themes"
 CYBERGRUB_THEME_DIR="${GRUB_THEMES_DIR}/CyberGRUB-2077"
 
@@ -287,12 +287,12 @@ run_cmd "if ! sudo grep -E '^GRUB_CMDLINE_LINUX_DEFAULT=.*splash' \"${GRUB_CFG}\
 run_cmd "sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
 # Add plymouth to mkinitcpio.conf HOOKS
-echo "Adding plymouth to mkinitcpio.conf..."
+echo -e "${STY_CYAN}Adding plymouth to mkinitcpio.conf...${STY_RST}"
 MKINIT_PLYMOUTH_CMD="if ! grep -q 'plymouth' /etc/mkinitcpio.conf; then sudo sed -i 's/^HOOKS=\(.*\)\(base udev\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf || sudo sed -i 's/^HOOKS=\(.*\)\(systemd\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf; else echo 'plymouth already in HOOKS, skipping...'; fi"
 run_cmd "$MKINIT_PLYMOUTH_CMD"
 
 # Install chika Plymouth theme
-echo "Installing chika Plymouth theme..."
+echo -e "${STY_CYAN}Installing chika Plymouth theme...${STY_RST}"
 PLYMOUTH_THEMES_DIR="/usr/share/plymouth/themes"
 run_cmd "sudo mkdir -p \"${PLYMOUTH_THEMES_DIR}/chika\""
 run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/chika\"/* \"${PLYMOUTH_THEMES_DIR}/chika/\""
@@ -302,61 +302,65 @@ fi # End of part 3
 # ===========================================================
 # 4) Apply customizations
 # ===========================================================
-echo "Applying the secret sauce..."
+echo -e "${STY_BOLD}${STY_YELLOW}Applying the secret sauce...${STY_RST}"
 
 # Copy .zshrc
-echo "Copying custom .zshrc..."
+echo -e "${STY_CYAN}Copying custom .zshrc...${STY_RST}"
 if [[ -f "$HOME/.zshrc" ]]; then
-  echo "Backing up existing .zshrc to .zshrc.backup.$(date +%Y%m%d_%H%M%S)"
+  echo -e "${STY_YELLOW}Backing up existing .zshrc to .zshrc.backup.$(date +%Y%m%d_%H%M%S)${STY_RST}"
   run_cmd "cp \"$HOME/.zshrc\" \"$HOME/.zshrc.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
 run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.zshrc\" \"$HOME/\""
 
 # Copy wallpaper directory
-echo "Copying wallpaper directory..."
+echo -e "${STY_CYAN}Copying wallpaper directory...${STY_RST}"
 run_cmd "mkdir -p \"$HOME/Wallpapers\""
 run_cmd "cp -r \"${BLOATER_ROOT}/bloat/wallpaper\"/* \"$HOME/Wallpapers/\""
 
 # Set initial wallpaper
-echo "Setting initial wallpaper..."
+echo -e "${STY_CYAN}Setting initial wallpaper...${STY_RST}"
 run_cmd "bash -c '~/.config/quickshell/ii/scripts/colors/switchwall.sh ~/Wallpapers/Kayoko.jpg & WALLPAPER_PID=\$!; sleep 10; kill \$WALLPAPER_PID 2>/dev/null; pkill -P \$WALLPAPER_PID 2>/dev/null; exit 0' || true"
 
 # Copy illogical-impulse config
-echo "Copying custom illogical-impulse config..."
+echo -e "${STY_CYAN}Copying custom illogical-impulse config...${STY_RST}"
 II_CONFIG_DIR="${XDG_CONFIG_HOME}/illogical-impulse"
 run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/illogical-impulse/config.json\" \"$II_CONFIG_DIR/\""
 
 # Update wallpaper path to current user
-echo "Updating wallpaper path for current user..."
+echo -e "${STY_CYAN}Updating wallpaper path for current user...${STY_RST}"
 run_cmd "sed -i 's|/home/[^/]*/Wallpapers/|/home/'\"$TARGET_USER\"'/Wallpapers/|g' \"$II_CONFIG_DIR/config.json\""
 
 # Monitor config
-echo "Configuring monitor settings..."
+echo -e "${STY_CYAN}Configuring monitor settings...${STY_RST}"
 HYPR_CONF_FILE="${XDG_CONFIG_HOME}/hypr/monitors.conf"
-MONITOR_LINE='monitor = , preferred, auto, 1.333334'
-run_cmd "grep -qF '\"$MONITOR_LINE\"' \"$HYPR_CONF_FILE\" 2>/dev/null || echo \"$MONITOR_LINE\" >> \"$HYPR_CONF_FILE\""
+
+# Create monitors.conf with all settings if it doesn't exist or is missing configurations
+run_cmd "if ! grep -q 'monitor = , preferred, auto, 1.333334' \"$HYPR_CONF_FILE\" 2>/dev/null; then echo 'monitor = , preferred, auto, 1.333334' >> \"$HYPR_CONF_FILE\"; fi"
+run_cmd "if ! grep -q 'force_zero_scaling' \"$HYPR_CONF_FILE\" 2>/dev/null; then printf '\\nxwayland {\\n  force_zero_scaling = true\\n}\\n' >> \"$HYPR_CONF_FILE\"; fi"
+run_cmd "if ! grep -q 'env = GDK_SCALE' \"$HYPR_CONF_FILE\" 2>/dev/null; then echo 'env = GDK_SCALE,2' >> \"$HYPR_CONF_FILE\"; fi"
+run_cmd "if ! grep -q 'env = XCURSOR_SIZE' \"$HYPR_CONF_FILE\" 2>/dev/null; then echo 'env = XCURSOR_SIZE,32' >> \"$HYPR_CONF_FILE\"; fi"
 
 # Modify Kitty to use zsh
-echo "Updating Kitty terminal to use Zsh..."
+echo -e "${STY_CYAN}Updating Kitty terminal to use Zsh...${STY_RST}"
 KITTY_FILE="${XDG_CONFIG_HOME}/kitty/kitty.conf"
 run_cmd "if grep -q '^shell fish' \"$KITTY_FILE\" 2>/dev/null; then sed -i 's/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/' \"$KITTY_FILE\"; elif ! grep -q '^shell zsh' \"$KITTY_FILE\" 2>/dev/null; then echo 'shell zsh' >> \"$KITTY_FILE\"; fi"
 
 # Modify Hyprland keybinds to add Vivaldi
-echo "Prioritizing Vivaldi in keybinds..."
+echo -e "${STY_CYAN}Prioritizing Vivaldi in keybinds...${STY_RST}"
 HYPR_KEYBINDS_FILE="${XDG_CONFIG_HOME}/hypr/hyprland/keybinds.conf"
 run_cmd "if grep -q 'launch_first_available.sh.*Browser' \"$HYPR_KEYBINDS_FILE\" 2>/dev/null && ! grep -q '\\\"vivaldi\\\"' \"$HYPR_KEYBINDS_FILE\" 2>/dev/null; then sed -i 's|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|bind = Super, W, exec, ~/.config/hypr/hyprland/scripts/launch_first_available.sh \\\"vivaldi\\\" \\\"google-chrome-stable\\\" \\\"zen-browser\\\" \\\"firefox\\\" \\\"brave\\\" \\\"chromium\\\" \\\"microsoft-edge-stable\\\" \\\"opera\\\" \\\"librewolf\\\" # Browser|' \"$HYPR_KEYBINDS_FILE\"; fi"
 
 # Copy Hyprlock helper script
-echo "Copying Hyprlock helper script..."
+echo -e "${STY_CYAN}Copying Hyprlock helper script...${STY_RST}"
 HYPRLOCK_DIR="${XDG_CONFIG_HOME}/hypr/hyprlock"
 run_cmd "mkdir -p \"$HYPRLOCK_DIR\""
 run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock/get_wallpaper_path.sh\" \"$HYPRLOCK_DIR/\""
 
 # Copy custom Hyprlock config
-echo "Copying custom Hyprlock config..."
+echo -e "${STY_CYAN}Copying custom Hyprlock config...${STY_RST}"
 HYPRLOCK_CONF="${XDG_CONFIG_HOME}/hypr/hyprlock.conf"
 if [[ -f "$HYPRLOCK_CONF" ]]; then
-  echo "Backing up existing hyprlock.conf to hyprlock.conf.backup.$(date +%Y%m%d_%H%M%S)"
+  echo -e "${STY_YELLOW}Backing up existing hyprlock.conf to hyprlock.conf.backup.$(date +%Y%m%d_%H%M%S)${STY_RST}"
   run_cmd "cp \"$HYPRLOCK_CONF\" \"$HYPRLOCK_CONF.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
 run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock.conf\" \"$HYPRLOCK_CONF\""
@@ -366,18 +370,18 @@ run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock.conf\" \"$HYPR
 # Use run_cmd for any modifications you want to persist
 # ===========================================================
 
-echo "✓ Customizations applied!"
+echo -e "${STY_GREEN}✓ Customizations applied!${STY_RST}"
 # End of part 4
 
 echo
-echo "Bloating complete! Your system is now beautifully bloated."
-echo "Mode: $MODE"
+echo -e "${STY_BOLD}${STY_GREEN}Bloating complete! Your system is now beautifully bloated.${STY_RST}"
+echo -e "${STY_BLUE}Mode:${STY_RST} ${STY_YELLOW}$MODE${STY_RST}"
 if [[ "$MODE" != "customize-only" ]]; then
   if [[ "$GPU_TYPE" == "nvidia" ]]; then
-    echo "Remember: You chose NVIDIA. May the driver gods be ever in your favor."
+    echo -e "${STY_YELLOW}Remember: You chose NVIDIA. May the driver gods be ever in your favor.${STY_RST}"
   elif [[ "$GPU_TYPE" == "skip" ]]; then
-    echo "GPU drivers skipped. Don't forget to install them yourself!"
+    echo -e "${STY_YELLOW}GPU drivers skipped. Don't forget to install them yourself!${STY_RST}"
   fi
 fi
 echo
-echo "Time to reboot and enjoy your feature-packed monstrosity!"
+echo -e "${STY_BOLD}${STY_CYAN}Time to reboot and enjoy your feature-packed monstrosity!${STY_RST}"

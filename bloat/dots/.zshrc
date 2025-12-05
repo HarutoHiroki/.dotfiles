@@ -108,6 +108,8 @@ alias dl="cd ~/Downloads"
 alias dt="cd ~/Desktop"
 alias update-grub="sudo grub-mkconfig -o /boot/grub/grub.cfg"
 alias dotsupdate="cd ~/.cache/dots-hyprland && git stash && git pull && ./setup install"
+alias startdocker="sudo systemctl start docker"
+alias startdefvirsh="sudo virsh net-start default"
 
 # Download Znap, if it's not there yet.
 [[ -r ~/.config/zsh/custom/znap/znap.zsh ]] ||

@@ -113,7 +113,6 @@ metapkgs=(
   "${BLOATER_ROOT}/bloat/deps/network"
   "${BLOATER_ROOT}/bloat/deps/power"
   "${BLOATER_ROOT}/bloat/deps/security"
-  "${BLOATER_ROOT}/bloat/deps/shell"
   "${BLOATER_ROOT}/bloat/deps/monitoring"
   "${BLOATER_ROOT}/bloat/deps/gaming"
   "${BLOATER_ROOT}/bloat/deps/virtualization"

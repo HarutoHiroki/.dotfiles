@@ -5,8 +5,10 @@ pkgdesc='Bloater Development Tools'
 arch=(any)
 license=(None)
 depends=(
+  exfat-utils
   git
   seahorse
   visual-studio-code-bin
   zip
+  zsh
 )

@@ -49,6 +49,7 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
    2. **AUR Packages (The Fun Stuff)**
       - `feishin` (music streaming client for the audiophiles)
       - `steam` (gaming, obviously)
+      - `sunshine` (game streaming)
       - `protonup-qt` (make Windows games work, it's basically magic)
       - `minecraft-launcher` (GET THE FK OUT OF MY ROOM I'M PLAYING MINECRAFT)
       - `visual-studio-code-bin` (yes, the proprietary one, sue me)

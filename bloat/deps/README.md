@@ -46,6 +46,7 @@ Japanese fonts and compatibility fonts for proper character rendering.
 - **minecraft-launcher** - Official Minecraft launcher
 - **protonup-qt** - GUI tool for installing and managing Proton-GE versions
 - **steam** - Valve's digital distribution platform
+- **sunshine** - Self-hosted game streaming server
 - **wine** - Windows compatibility layer for running Windows applications
 
 ### GPU - AMD

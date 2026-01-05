@@ -9,5 +9,6 @@ depends=(
   minecraft-launcher
   protonup-qt
   steam
+  sunshine
   wine
 )

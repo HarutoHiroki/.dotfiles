@@ -111,11 +111,16 @@ alias dotsupdate="cd ~/.cache/dots-hyprland && git stash && git pull && ./setup 
 alias startdocker="sudo systemctl start docker"
 alias startdefvirsh="sudo virsh net-start default"
 
+# QT5 env stuff
+export QT_QPA_PLATFORM="wayland;xcb"
+export QT_SCALE_FACTOR_ROUNDING_POLICY=Round
+export QT_SCALE_FACTOR=1.333333
+
 # Download Znap, if it's not there yet.
 [[ -r ~/.config/zsh/custom/znap/znap.zsh ]] ||
     git clone --depth 1 -- \
         https://github.com/marlonrichert/zsh-snap.git ~/.config/zsh/custom/znap
-source ~/.config/zsh/custom/znap.zsh  # Start Znap
+source ~/.config/zsh/custom/znap/znap.zsh     # Start Znap
 znap source marlonrichert/zsh-autocomplete    # Autocomplete
 znap source zsh-users/zsh-autosuggestions     # Autosuggestions
 znap source zsh-users/zsh-syntax-highlighting # Highlighting

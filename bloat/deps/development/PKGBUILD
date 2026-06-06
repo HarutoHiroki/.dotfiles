@@ -6,7 +6,7 @@ arch=(any)
 license=(None)
 depends=(
   devtools
-  exfat-utils
+  exfatprogs
   git
   less
   seahorse

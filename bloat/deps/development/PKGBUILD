@@ -10,8 +10,7 @@ depends=(
   git
   less
   seahorse
-  vscodium
-  vscodium-marketplace
+  visual-studio-code-bin
   zip
   zsh
 )

@@ -25,7 +25,7 @@ This directory contains metapackages that organize all the software installed by
 - **exfatprogs** - exfat stuff
 - **git** - Distributed version control system
 - **seahorse** - GNOME keyring manager for passwords and encryption keys
-- **vscodium** - Code editor
+- **visual-studio-code-bin** - yes the propriety one bite me
 - **zip** - Archive compression utility
 
 ### Fonts

@@ -190,8 +190,8 @@ PAMEOF"
 fi
 run_cmd "$PAM_CONFIG_CMD"
 
-# Install VSCodium ~~bloat~~ extensions
-echo -e "${STY_CYAN}Installing VSCodium extensions...${STY_RST}"
+# Install VS Code ~~bloat~~ extensions
+echo -e "${STY_CYAN}Installing VS Code extensions...${STY_RST}"
 VSCODE_EXTENSIONS=(
 aaron-bond.better-comments
 alefragnani.project-manager
@@ -233,15 +233,15 @@ ziyasal.vscode-open-in-github
 )
 
 # Build command with all extensions
-VSCODE_EXT_CMD="codium"
+VSCODE_EXT_CMD="code"
 for ext in "${VSCODE_EXTENSIONS[@]}"; do
   VSCODE_EXT_CMD="$VSCODE_EXT_CMD --install-extension ${ext}"
 done
 run_cmd "$VSCODE_EXT_CMD"
 
-# Configure VSCodium settings (theme and icons)
-echo -e "${STY_CYAN}Configuring VSCodium theme and icons...${STY_RST}"
-VSCODE_SETTINGS_DIR="${XDG_CONFIG_HOME}/VSCodium/User"
+# Configure VS Code settings (theme and icons)
+echo -e "${STY_CYAN}Configuring VS Code theme and icons...${STY_RST}"
+VSCODE_SETTINGS_DIR="${XDG_CONFIG_HOME}/Code/User"
 VSCODE_SETTINGS_FILE="$VSCODE_SETTINGS_DIR/settings.json"
 
 run_cmd "mkdir -p \"$VSCODE_SETTINGS_DIR\""

@@ -198,7 +198,6 @@ alefragnani.project-manager
 anthropic.claude-code
 codezombiech.gitignore
 dbaeumer.vscode-eslint
-donjayamanne.git-extension-pack
 donjayamanne.githistory
 ecmel.vscode-html-css
 esbenp.prettier-vscode

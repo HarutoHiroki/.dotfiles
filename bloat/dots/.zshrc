@@ -114,7 +114,6 @@ alias startdefvirsh="sudo virsh net-start default"
 # QT5 env stuff
 export QT_QPA_PLATFORM="wayland;xcb"
 export QT_SCALE_FACTOR_ROUNDING_POLICY=Round
-export QT_SCALE_FACTOR=1.333333
 
 # Download Znap, if it's not there yet.
 [[ -r ~/.config/zsh/custom/znap/znap.zsh ]] ||

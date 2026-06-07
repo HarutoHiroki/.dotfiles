@@ -22,9 +22,10 @@ This directory contains metapackages that organize all the software installed by
 
 ### Development
 
+- **exfatprogs** - exfat stuff
 - **git** - Distributed version control system
 - **seahorse** - GNOME keyring manager for passwords and encryption keys
-- **visual-studio-code-bin** - Microsoft's code editor (binary from AUR)
+- **vscodium** - Code editor
 - **zip** - Archive compression utility
 
 ### Fonts

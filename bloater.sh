@@ -201,7 +201,6 @@ dbaeumer.vscode-eslint
 donjayamanne.githistory
 ecmel.vscode-html-css
 esbenp.prettier-vscode
-felipecaputo.git-project-manager
 github.remotehub
 github.vscode-pull-request-github
 hookyqr.minify

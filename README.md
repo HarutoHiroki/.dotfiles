@@ -69,7 +69,7 @@ When running in full installation mode, bloater will:
    - Configure Discord to skip host updates and enable devtools
    - Set up PAM for Hyprlock fingerprint authentication (and some ricing)
 4. **VS Code**
-   - Install 44 essential extensions
+   - Install 36 essential extensions
    - Set Material Theme Ocean
    - Apply Material Icon Theme
 5. **Boot Themes**
@@ -126,7 +126,7 @@ The bloater supports AMD and NVIDIA graphics cards with their respective ~~bloat
 
 **AMD Stack (Open Sourced means better):**
 - Mesa (OpenGL/Vulkan drivers that actually work out of the box)
-- VDPAU (hardware video acceleration without selling your soul)
+- VA-API (hardware video decode that Firefox and mpv will actually use)
 - Vulkan-radeon (ray tracing without proprietary shackles)
 - 32-bit library support (seamless gaming experience)
 - Wayland support that doesn't make you want to cry

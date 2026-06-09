@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Low Cortisol Tachyon
+Description=Umamusume Agnes Tachyon theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/agnes
+ScriptFile=/usr/share/plymouth/themes/agnes/agnes.script

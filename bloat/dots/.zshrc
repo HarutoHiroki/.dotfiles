@@ -57,7 +57,7 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 HIST_STAMPS="dd/mm/yyyy"
 HISTFILE=~/.zsh_history
 HISTSIZE=1000
-SAVEHIST=2000
+SAVEHIST=1000
 setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt hist_ignore_dups       # ignore duplicated commands history list
 setopt hist_ignore_space      # ignore commands that start with space
@@ -124,5 +124,8 @@ znap source marlonrichert/zsh-autocomplete    # Autocomplete
 znap source zsh-users/zsh-autosuggestions     # Autosuggestions
 znap source zsh-users/zsh-syntax-highlighting # Highlighting
 
-# Auto launching Hyprland
-source ~/.config/zshrc.d/auto-Hypr.sh
+# Auto launching Hyprland on tty1
+if [ -z "$DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
+  mkdir -p ~/.cache
+  exec start-hyprland > ~/.cache/hyprland.log 2>&1
+fi

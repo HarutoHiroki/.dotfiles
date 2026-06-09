@@ -54,29 +54,25 @@ Japanese fonts and compatibility fonts for proper character rendering.
 
 Open source AMD GPU drivers and libraries.
 
-- **glu** - OpenGL utility library
-- **lib32-glu** - 32-bit OpenGL utility library for compatibility
-- **lib32-mesa** - 32-bit Mesa 3D graphics library
-- **lib32-mesa-vdpau** - 32-bit VDPAU video acceleration
-- **lib32-vulkan-radeon** - 32-bit Vulkan driver for AMD GPUs
 - **mesa** - Open source OpenGL implementation
-- **mesa-vdpau** - VDPAU video acceleration for Mesa
+- **vulkan-radeon** - Vulkan driver for AMD GPUs (RADV)
 - **vulkan-icd-loader** - Vulkan Installable Client Driver loader
+- **libva-mesa-driver** - VA-API hardware video decode
+- **lib32-mesa** - 32-bit Mesa for Proton/Wine
+- **lib32-vulkan-radeon** - 32-bit Vulkan driver for AMD GPUs
 - **lib32-vulkan-icd-loader** - 32-bit Vulkan ICD loader
-- **vulkan-radeon** - Vulkan driver for AMD GPUs
+- **lib32-libva-mesa-driver** - 32-bit VA-API hardware video decode
 
 ### GPU - NVIDIA
 
 Proprietary NVIDIA GPU drivers and libraries.
 
-- **glu** - OpenGL utility library
-- **lib32-glu** - 32-bit OpenGL utility library
-- **lib32-nvidia-utils** - 32-bit NVIDIA utilities for compatibility
-- **lib32-vulkan-icd-loader** - 32-bit Vulkan ICD loader
 - **nvidia** - NVIDIA proprietary kernel module
+- **nvidia-utils** - NVIDIA userspace driver, libraries, and Vulkan ICD
 - **nvidia-settings** - NVIDIA driver control panel
-- **nvidia-utils** - NVIDIA utilities and libraries
+- **lib32-nvidia-utils** - 32-bit NVIDIA utilities for Proton/Wine
 - **vulkan-icd-loader** - Vulkan Installable Client Driver loader
+- **lib32-vulkan-icd-loader** - 32-bit Vulkan ICD loader
 
 ### Media
 

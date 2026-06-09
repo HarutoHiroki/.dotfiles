@@ -251,7 +251,7 @@ run_cmd "$VSCODE_THEME_CMD"
 
 # Remove unused display managers
 echo -e "${STY_CYAN}Removing unused display managers (none look good)...${STY_RST}"
-REMOVE_CMD="sudo pacman -Rns ${PACMAN_FLAGS} sddm gdm lightdm || true"
+REMOVE_CMD="sudo pacman -Rns sddm gdm lightdm || true"
 run_cmd "$REMOVE_CMD"
 
 echo -e "${STY_BOLD}${STY_YELLOW}Installing bootup themes...${STY_RST}"
@@ -278,25 +278,27 @@ run_cmd "if ! sudo grep -E '^GRUB_CMDLINE_LINUX_DEFAULT=.*splash' \"${GRUB_CFG}\
 # Update GRUB
 run_cmd "sudo grub-mkconfig -o /boot/grub/grub.cfg"
 
-# Add plymouth to HOOKS (Arch uses mkinitcpio.conf, endeavour uses dracut)
-# echo -e "${STY_CYAN}Adding plymouth to mkinitcpio.conf...${STY_RST}"
-# MKINIT_PLYMOUTH_CMD="if ! grep -q 'plymouth' /etc/mkinitcpio.conf; then sudo sed -i 's/^HOOKS=\(.*\)\(base udev\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf || sudo sed -i 's/^HOOKS=\(.*\)\(systemd\)/HOOKS=\\1\\2 plymouth/' /etc/mkinitcpio.conf; else echo 'plymouth already in HOOKS, skipping...'; fi"
-# run_cmd "$MKINIT_PLYMOUTH_CMD"
-echo -e "${STY_CYAN}Configuring dracut for plymouth...${STY_RST}"
-DRACUT_CONF="/etc/dracut.conf.d/haru.conf"
-DRACUT_LINE="add_dracutmodules+=\" plymouth \""
-run_cmd "sudo mkdir -p /etc/dracut.conf.d && if ! sudo grep -q 'plymouth' \"${DRACUT_CONF}\" 2>/dev/null; then if sudo grep -q '^add_dracutmodules+=' \"${DRACUT_CONF}\" 2>/dev/null; then sudo sed -i -E 's/^(add_dracutmodules+=\".*)(\")/\\1 plymouth \\2/' \"${DRACUT_CONF}\"; else echo '${DRACUT_LINE}' | sudo tee -a \"${DRACUT_CONF}\" > /dev/null; fi; fi"
-
-# Install chika Plymouth theme
-echo -e "${STY_CYAN}Installing chika Plymouth theme...${STY_RST}"
+# Install Low cortisol Agnes Tachyon Plymouth theme
+echo -e "${STY_CYAN}Installing agnes Plymouth theme...${STY_RST}"
 PLYMOUTH_THEMES_DIR="/usr/share/plymouth/themes"
-run_cmd "sudo mkdir -p \"${PLYMOUTH_THEMES_DIR}/chika\""
-run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/chika\"/* \"${PLYMOUTH_THEMES_DIR}/chika/\""
-# run_cmd "sudo plymouth-set-default-theme -R chika"
-PLYMOUTH_CONF="/etc/plymouth/plymouthd.conf"
-run_cmd "sudo mkdir -p /etc/plymouth && if sudo grep -q '^Theme=' \"${PLYMOUTH_CONF}\" 2>/dev/null; then sudo sed -i 's/^Theme=.*/Theme=chika/' \"${PLYMOUTH_CONF}\"; else echo -e '[Daemon]\nTheme=chika' | sudo tee \"${PLYMOUTH_CONF}\" > /dev/null; fi"
-echo -e "${STY_CYAN}Rebuilding initramfs with dracut...${STY_RST}"
-run_cmd "sudo dracut-rebuild"
+run_cmd "sudo mkdir -p \"${PLYMOUTH_THEMES_DIR}/agnes\""
+run_cmd "sudo cp -r \"${BLOATER_ROOT}/bloat/themes/agnes\"/* \"${PLYMOUTH_THEMES_DIR}/agnes/\""
+
+# Detect initramfs manager and configure plymouth accordingly
+if command -v mkinitcpio &>/dev/null; then
+  echo -e "${STY_CYAN}Detected mkinitcpio — injecting plymouth into HOOKS...${STY_RST}"
+  run_cmd "if ! sudo grep -q 'plymouth' /etc/mkinitcpio.conf; then sudo sed -i '/^HOOKS=/s/\(udev\|systemd\)/\1 plymouth/' /etc/mkinitcpio.conf; else echo 'plymouth already in HOOKS, skipping...'; fi"
+  echo -e "${STY_CYAN}Setting agnes as default Plymouth theme and rebuilding initramfs...${STY_RST}"
+  run_cmd "sudo plymouth-set-default-theme -R agnes"
+elif command -v dracut &>/dev/null; then
+  echo -e "${STY_CYAN}Detected dracut — configuring Plymouth theme...${STY_RST}"
+  PLYMOUTH_CONF="/etc/plymouth/plymouthd.conf"
+  run_cmd "sudo mkdir -p /etc/plymouth && if sudo grep -q '^Theme=' \"${PLYMOUTH_CONF}\" 2>/dev/null; then sudo sed -i 's/^Theme=.*/Theme=agnes/' \"${PLYMOUTH_CONF}\"; else echo -e '[Daemon]\nTheme=agnes' | sudo tee \"${PLYMOUTH_CONF}\" > /dev/null; fi"
+  echo -e "${STY_CYAN}Rebuilding initramfs with dracut...${STY_RST}"
+  run_cmd "sudo dracut-rebuild"
+else
+  echo -e "${STY_YELLOW}Neither mkinitcpio nor dracut detected — skipping initramfs rebuild. Set up Plymouth manually.${STY_RST}"
+fi
 fi # End of part 3
 
 # ===========================================================
@@ -330,26 +332,30 @@ run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/illogical-impulse/config.jso
 echo -e "${STY_CYAN}Updating wallpaper path for current user...${STY_RST}"
 run_cmd "sed -i 's|/home/[^/]*/Wallpapers/|/home/'\"$TARGET_USER\"'/Wallpapers/|g' \"$II_CONFIG_DIR/config.json\""
 
+# Modify Kitty to use zsh
+echo -e "${STY_CYAN}Updating Kitty terminal to use Zsh...${STY_RST}"
+KITTY_FILE="${XDG_CONFIG_HOME}/kitty/kitty.conf"
+run_cmd "if grep -q '^shell fish' \"$KITTY_FILE\" 2>/dev/null; then sed -i 's/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/' \"$KITTY_FILE\"; elif ! grep -q '^shell zsh' \"$KITTY_FILE\" 2>/dev/null; then echo 'shell zsh' >> \"$KITTY_FILE\"; fi"
+
 # Monitor config
 echo -e "${STY_CYAN}Configuring monitor settings...${STY_RST}"
-MONITOR_LUA_FILE="${XDG_CONFIG_HOME}/hypr/monitors.conf"
+MONITOR_LUA_FILE="${XDG_CONFIG_HOME}/hypr/monitors.lua"
 if [[ -f "$MONITOR_LUA_FILE" ]]; then
   echo -e "${STY_YELLOW}Backing up existing monitors.lua to monitors.lua.backup.$(date +%Y%m%d_%H%M%S)${STY_RST}"
   run_cmd "cp \"$MONITOR_LUA_FILE\" \"$MONITOR_LUA_FILE.backup.$(date +%Y%m%d_%H%M%S)\""
 fi
 run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/monitors.lua\" \"$MONITOR_LUA_FILE\""
 
-# Modify Kitty to use zsh
-echo -e "${STY_CYAN}Updating Kitty terminal to use Zsh...${STY_RST}"
-KITTY_FILE="${XDG_CONFIG_HOME}/kitty/kitty.conf"
-run_cmd "if grep -q '^shell fish' \"$KITTY_FILE\" 2>/dev/null; then sed -i 's/^shell fish/# shell fish\\n\\n# Use zsh\\nshell zsh/' \"$KITTY_FILE\"; elif ! grep -q '^shell zsh' \"$KITTY_FILE\" 2>/dev/null; then echo 'shell zsh' >> \"$KITTY_FILE\"; fi"
+# Modify Hyprland general config
+echo -e "${STY_CYAN}Updating Hyprland general config...${STY_RST}"
+HYPR_GENERAL_LUA="${XDG_CONFIG_HOME}/hypr/custom/general.lua"
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprland/general.lua\" \"$HYPR_GENERAL_LUA\""
+
 
 # Modify Hyprland variables to add Vivaldi
-echo -e "${STY_CYAN}Prioritizing Vivaldi in variables...${STY_RST}"
-DEFAULT_HYPR_VARIABLES_FILE="${XDG_CONFIG_HOME}/hypr/hyprland/variables.lua"
-CUSTOM_HYPR_VARIABLES_FILE="${XDG_CONFIG_HOME}/hypr/custom/variables.lua"
-run_cmd "cp -f \"$DEFAULT_HYPR_VARIABLES_FILE\" \"$CUSTOM_HYPR_VARIABLES_FILE\""
-run_cmd "if grep -q 'launch_first_available.sh' \"$CUSTOM_HYPR_VARIABLES_FILE\" 2>/dev/null && ! grep -q \"'vivaldi'\" \"$CUSTOM_HYPR_VARIABLES_FILE\" 2>/dev/null; then sed -i \"s|browser = \\\"~/.config/hypr/hyprland/scripts/launch_first_available.sh 'google-chrome-stable' 'zen-browser' 'firefox' 'brave' 'chromium' 'microsoft-edge-stable' 'opera' 'librewolf'\\\"|browser = \\\"~/.config/hypr/hyprland/scripts/launch_first_available.sh 'vivaldi' 'google-chrome-stable' 'zen-browser' 'firefox' 'brave' 'chromium' 'microsoft-edge-stable' 'opera' 'librewolf'\\\"|\" \"$CUSTOM_HYPR_VARIABLES_FILE\"; fi"
+echo -e "${STY_CYAN}Adding Vivaldi to browser list...${STY_RST}"
+HYPR_VARIABLES_LUA="${XDG_CONFIG_HOME}/hypr/custom/variables.lua"
+run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprland/variables.lua\" \"$HYPR_VARIABLES_LUA\""
 
 # Copy custom Hyprlock config
 echo -e "${STY_CYAN}Copying custom Hyprlock config...${STY_RST}"

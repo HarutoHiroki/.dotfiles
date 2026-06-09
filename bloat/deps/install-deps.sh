@@ -128,7 +128,11 @@ fi
 # Install each metapackage
 for i in "${metapkgs[@]}"; do
   metainstallflags="--needed"
-  $ask && showfun install-local-pkgbuild || metainstallflags="$metainstallflags --noconfirm"
+  if $ask; then
+    showfun install-local-pkgbuild
+  else
+    metainstallflags="$metainstallflags --noconfirm"
+  fi
   v install-local-pkgbuild "$i" "$metainstallflags"
 done
 

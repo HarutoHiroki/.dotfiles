@@ -1,0 +1,108 @@
+// Author: yours truly HarutoHiroki
+// Git: wherever this is hosted lol
+
+// Screen size
+screen.w = Window.GetWidth(0);
+screen.h = Window.GetHeight(0);
+
+spr = Sprite();
+
+// Scale sprite
+scale = 0.5;
+for (i = 1; i <= 12; i++) {
+    agnes = Image("f-" + i + ".png");
+    frames[i] = agnes.Scale(
+        Math.Int(agnes.GetWidth() * scale),
+        Math.Int(agnes.GetHeight() * scale)
+    );
+}
+
+// Center sprite
+spr.SetX(screen.w / 2 - frames[1].GetWidth() / 2);
+spr.SetY(screen.h / 2 - frames[1].GetHeight() / 2);
+
+// Animate Sprite
+
+stress = 0;
+fun low_cortesol() {
+    spr.SetImage(frames[Math.Int(stress / 3) % 12 + 1]);
+    stress++;
+}
+
+Plymouth.SetRefreshFunction(low_cortesol);
+
+// Message thingy
+fun displayMessageCallback (text) {
+  prompt.image = Image.Text(text, 1, 1, 1);
+  prompt.sprite = Sprite(prompt.image);
+  prompt.sprite.SetPosition(
+    screen.w / 2 - prompt.image.GetWidth() / 2,
+    spr.GetY() + frames[1].GetHeight() + 50,
+    10000
+  );
+  global.prompt = prompt;
+}
+
+Plymouth.SetMessageFunction(displayMessageCallback);
+
+// Password thingy
+passwordDot.image = Image("password-dot.png");
+
+fun passDialog() {
+    passwordField.image = Image("password-field.png");
+    passwordField.sprite = Sprite(passwordField.image);
+    passwordField.y = spr.GetY() + frames[1].GetHeight();
+    passwordField.x = screen.w / 2 - passwordField.image.GetWidth() / 2;
+    passwordField.sprite.SetY(passwordField.y);
+    passwordField.sprite.SetX(passwordField.x);
+    global.passwordField = passwordField;
+}
+
+fun setPassOpacity(opacity) {
+    passwordField.sprite.SetOpacity(opacity);
+
+    for (i = 0; passwordField.bullets[i]; i++)
+    passwordField.bullets[i].sprite.SetOpacity(opacity);
+}
+
+fun passCallback (prompt, bullets) {
+  global.status = "password";
+
+  if (!global.passwordField)
+    passDialog();
+  else
+    setPassOpacity(1);
+
+  displayMessageCallback(prompt);
+
+  bulletWidth = passwordDot.image.GetWidth();
+
+  for (i = 0;
+      passwordField.bullets[i] || i < bullets && i < 16;
+      i++) {
+    if (!passwordField.bullets[i]) {
+      passwordField.bullets[i].sprite = Sprite(passwordDot.image);
+      passwordField.bullets[i].sprite.SetX(passwordField.x
+          + (i + 1) * bulletWidth);
+      passwordField.bullets[i].sprite.SetY(passwordField.y);
+    }
+
+    if (i < bullets)
+      passwordField.bullets[i].sprite.SetOpacity(1);
+    else
+      passwordField.bullets[i].sprite.SetOpacity(0);
+  }
+}
+
+Plymouth.SetDisplayPasswordFunction(passCallback);
+
+fun displayNormalCallback() {
+  if (global.passwordField) {
+    setPassOpacity(0);
+  }
+  if (global.prompt) {
+    global.prompt.sprite.SetOpacity(0);
+  }
+}
+
+Plymouth.SetDisplayNormalFunction(displayNormalCallback);

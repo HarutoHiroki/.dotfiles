@@ -5,12 +5,10 @@ pkgdesc='Bloater NVIDIA GPU Drivers'
 arch=(any)
 license=(None)
 depends=(
-  glu
-  lib32-glu
-  lib32-nvidia-utils
-  lib32-vulkan-icd-loader
   nvidia
   nvidia-settings
   nvidia-utils
   vulkan-icd-loader
+  lib32-nvidia-utils
+  lib32-vulkan-icd-loader
 )

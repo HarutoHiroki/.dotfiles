@@ -371,6 +371,27 @@ run_cmd "cp -f \"${BLOATER_ROOT}/bloat/dots/.config/hypr/hyprlock.conf\" \"$HYPR
 # Use run_cmd for any modifications you want to persist
 # ===========================================================
 
+# ===========================================================
+# Highly Personal Stuff, comment out or modify anything you don't want
+# ===========================================================
+
+# Configure GPG
+echo -e "${STY_CYAN}Configuring GPG settings...${STY_RST}"
+GPG_CONF="$HOME/.gnupg/gpg.conf"
+run_cmd "mkdir -p \"$HOME/.gnupg\""
+run_cmd "touch \"$GPG_CONF\""
+
+# Add GPG options if they don't exist
+run_cmd "grep -q '^armor' \"$GPG_CONF\" || echo 'armor' >> \"$GPG_CONF\""
+run_cmd "grep -q 'Those who would give up a little liberty' \"$GPG_CONF\" || echo 'comment Those who would give up a little liberty to preserve a temporary safety, deserve neither liberty nor safety.' >> \"$GPG_CONF\""
+run_cmd "grep -q 'HarutoHiroki <root@harutohiroki.com>' \"$GPG_CONF\" || echo 'comment HarutoHiroki <root@harutohiroki.com>' >> \"$GPG_CONF\""
+
+# Configure Git global settings
+echo -e "${STY_CYAN}Configuring Git global settings...${STY_RST}"
+run_cmd "git config --global user.name 'HarutoHiroki'"
+run_cmd "git config --global user.email 'root@harutohiroki.com'"
+run_cmd "git config --global commit.gpgsign true"
+
 echo -e "${STY_GREEN}✓ Customizations applied!${STY_RST}"
 # End of part 4
 

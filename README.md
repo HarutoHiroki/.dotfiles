@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This repository contains my personal dotfiles and an automated bloating script to quickly transform a fresh Arch Linux system into a beautiful, feature-packed monstrosity with my preferred configuration.
+This repository contains my personal dotfiles and an automated bloating script to quickly transform a fresh Arch Linux system into a beautiful, feature-packed monstrosity with my preferred configuration. (KEYWORD **"MY PREFERED CONFIGURATION"** aka there are some personal settings in `bloater.sh`)
 
 **Important:** These dotfiles are specifically designed as extra spice for [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (illogical-impulse quickshell dots). You **must** install end-4's beautiful base configuration first before unleashing this bloater upon your system.
 
@@ -30,7 +30,7 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
 ### Package Installation (The Main Event)
    1. **Pacman Packages**
       - **Fonts**: Every Japanese font known to mankind (Adobe Source Han, Noto CJK, IPA, VLGothic, Jigmo) plus compatibility fonts for that one weird app
-      - **Development**: `git` (duh), `zip`, `seahorse` (for when you forget your passwords)
+      - **Development**: `git` (duh), `zip`, `less`, `seahorse` (for when you forget your passwords)
       - **X11**: `xorg-xhost` (Timeshift GTK throws a tantrum without it)
       - **Power Management**: `upower`, `acpid`, `powertop`, `power-profiles-daemon` (laptop battery goes brrr)
       - **Browser**: `vivaldi` (because screw you Google and Mozilla I know its chromium-based but still)
@@ -40,10 +40,10 @@ The `bloater.sh` (formerly known by its boring name `install.sh`) is designed fo
       - **Audio**: `easyeffects` (EQ is the way)
       - **Containers**: `docker` (containerize all the things!)
       - **System Tools**: `btop` (htop but prettier), `fastfetch` (neofetch creator took up farming), `fwupd` for firmware shenanigans
-      - **Graphics**: Complete AMD GPU stack (smooth sailing) or NVIDIA stack (o7) with   32-bit support (more info below)
+      - **Graphics**: Complete AMD GPU stack (smooth sailing) or NVIDIA stack (o7) with 32-bit support (more info below), plus `qt5-wayland` for some Wayland compatibility
       - **Media**: `mpv` (the best video player, fight me), `imv` image viewer
       - **VPN**: `openvpn` and `networkmanager-openvpn`, `wireguard-tools` (for totally legal purposes)
-      - **Network Tools**: `nmap`, `wireshark` (definitely for educational purposes only)
+      - **Network Tools**: `net-tools`, `nmap`, `nslookup`, `traceroute`, `wireshark`
       - **Gaming**: `wine`, `lutris` (Windows games on Linux)
       - **Flatpak**: Because sometimes you need extra sandboxes
    2. **AUR Packages (The Fun Stuff)**

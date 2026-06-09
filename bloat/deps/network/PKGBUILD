@@ -5,9 +5,13 @@ pkgdesc='Bloater Network and VPN Tools'
 arch=(any)
 license=(None)
 depends=(
+  net-tools
   networkmanager-openvpn
+  network-manager-applet
   nmap
+  nslookup
   openvpn
+  traceroute
   wireshark-cli
   wireshark-qt
   wireguard-tools

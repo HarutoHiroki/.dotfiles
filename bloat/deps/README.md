@@ -24,6 +24,7 @@ This directory contains metapackages that organize all the software installed by
 
 - **exfatprogs** - exfat stuff
 - **git** - Distributed version control system
+- **less** - Terminal pager for viewing text files
 - **seahorse** - GNOME keyring manager for passwords and encryption keys
 - **visual-studio-code-bin** - yes the propriety one bite me
 - **zip** - Archive compression utility
@@ -46,6 +47,7 @@ Japanese fonts and compatibility fonts for proper character rendering.
 - **lutris** - Open source gaming platform for managing game installations
 - **minecraft-launcher** - Official Minecraft launcher
 - **protonup-qt** - GUI tool for installing and managing Proton-GE versions
+- **qt5-wayland** - Qt platform plugin for Wayland, required for some programs to run properly under Wayland
 - **steam** - Valve's digital distribution platform
 - **sunshine** - Self-hosted game streaming server
 - **wine** - Windows compatibility layer for running Windows applications
@@ -89,9 +91,12 @@ Proprietary NVIDIA GPU drivers and libraries.
 
 Networking tools and VPN support.
 
+- **net-tools** - Legacy networking tools for configuring network interfaces
 - **networkmanager-openvpn** - NetworkManager plugin for OpenVPN
 - **nmap** - Network discovery and security auditing tool
+- **nslookup** - DNS lookup utility
 - **openvpn** - Open source VPN solution
+- **traceroute** - Network path tracing tool
 - **wireshark-cli** - Command-line network protocol analyzer
 - **wireshark-qt** - GUI network protocol analyzer
 - **wireguard-tools** - Fast, modern, secure VPN tunnel

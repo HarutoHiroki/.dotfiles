@@ -8,6 +8,7 @@ depends=(
   lutris
   minecraft-launcher
   protonup-qt
+  qt5-wayland
   steam
   sunshine
   wine

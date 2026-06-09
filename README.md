@@ -1,3 +1,7 @@
+# ARCHIVED
+### go to https://git.harutohiroki.com/harutohiroki/.dotfiles instead. It's hosted there now!!!
+<br>
+
 # Dotfiles (Now With Extra Bloat!)
 
 ## Introduction

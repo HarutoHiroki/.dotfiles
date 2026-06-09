@@ -2,11 +2,13 @@
 
 ## Introduction
 
-This repository contains my personal dotfiles and an automated bloating script to quickly transform a fresh Arch Linux system into a beautiful, feature-packed monstrosity with my preferred configuration. (KEYWORD **"MY PREFERED CONFIGURATION"** aka there are some personal settings in `bloater.sh`)
+This repository contains my personal dotfiles and an automated bloating script to quickly transform a fresh Arch Linux system into a beautiful, feature-packed monstrosity with my preferred configuration.
 
 **Important:** These dotfiles are specifically designed as extra spice for [end-4/dots-hyprland](https://github.com/end-4/dots-hyprland) (illogical-impulse quickshell dots). You **must** install end-4's beautiful base configuration first before unleashing this bloater upon your system.
 
 **Also Important:** This bloater script is lovingly crafted for my **Framework Laptop 13** (AI 300 yada yada smh AMD) - the glorious king of Right to Repair. You know, a laptop that *doesn't* decide to commit sudoku after 2 years like a certain ASUS Zephyrus G15 whose GPU died >:(. While this script *might* work on your non-Framework device, there are no guarantees. Expect potential shenanigans on different hardware configurations, particularly those designed by corporations allergic to iFixit scores.
+
+**Also ALSO Important:** KEYWORD **"MY PREFERED CONFIGURATION"** aka there are some personal settings you may want to change at the end of `bloater.sh`
 
 ## Prerequisites (The Boring Stuff You Can't Skip)
 
